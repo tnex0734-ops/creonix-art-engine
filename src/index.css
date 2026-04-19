@@ -124,6 +124,17 @@
     box-shadow: 2px 2px 0 0 hsl(var(--ink));
   }
 
+  /* Marquee ticker */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+  .animate-marquee:hover { animation-play-state: paused; }
+
   /* Visible chunky scrollbar for the styles showcase row */
   .style-scroll {
     scrollbar-width: thin;
