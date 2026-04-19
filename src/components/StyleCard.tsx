@@ -1,4 +1,5 @@
 import { STYLE_PREVIEWS } from "./style-previews/StyleSvgPreviews";
+import { STYLE_IMAGES } from "./style-previews/styleImages";
 import type { Style } from "@/lib/styles";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 
 export const StyleCard = ({ style, selected = false, onSelect, size = "md", rounded = false }: Props) => {
   const Preview = STYLE_PREVIEWS[style.name];
+  const image = STYLE_IMAGES[style.name];
   const dims =
     size === "lg" ? "w-[280px] h-[280px]" : size === "sm" ? "w-[180px] h-[180px]" : "w-full aspect-square";
   const roundedCls = rounded || style.name === "3D Clay" ? "rounded-2xl" : "";
@@ -28,9 +30,20 @@ export const StyleCard = ({ style, selected = false, onSelect, size = "md", roun
       }`}
       style={{ minHeight: 44, minWidth: 44 }}
     >
-      {/* Preview fills top 75% */}
-      <div className={`relative w-full overflow-hidden ${roundedCls ? "rounded-t-2xl" : ""}`} style={{ height: "75%" }}>
-        {Preview ? <Preview /> : null}
+      {/* Top 75%: photographic reference + SVG decorative overlay */}
+      <div className={`relative w-full overflow-hidden bg-muted ${roundedCls ? "rounded-t-2xl" : ""}`} style={{ height: "75%" }}>
+        {image ? (
+          <img
+            src={image}
+            alt=""
+            loading="lazy"
+            width={512}
+            height={512}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : Preview ? (
+          <Preview />
+        ) : null}
         {selected && <div className="absolute inset-0 bg-primary/15 pointer-events-none" />}
       </div>
       {/* Label */}
