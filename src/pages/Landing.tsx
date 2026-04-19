@@ -3,76 +3,189 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { STYLES } from "@/lib/styles";
 import { StyleCard } from "@/components/StyleCard";
-import { ArrowRight, Sparkles, Type, Download } from "lucide-react";
+import { STYLE_IMAGES } from "@/components/style-previews/styleImages";
+import { ArrowRight, Sparkles, Type, Download, Star, Zap } from "lucide-react";
 
 const Landing = () => {
+  // Pick 3 featured styles for the hero collage
+  const heroStyles = ["Psychedelic", "3D Clay", "Isometric"];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b-[3px] border-ink">
-        <div className="container grid lg:grid-cols-2 gap-10 lg:gap-16 py-14 md:py-20 items-center">
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-accent text-ink text-xs font-extrabold uppercase mb-6">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              AI illustration generator
+      {/* HERO — asymmetric Bauhaus grid */}
+      <section className="relative overflow-hidden border-b-[3px] border-ink bg-background">
+        {/* Background grid overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--ink)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--ink)) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+
+        {/* Floating corner shapes */}
+        <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-accent border-[3px] border-ink hidden md:block" />
+        <div className="absolute top-32 right-1/3 h-6 w-6 bg-primary border-[3px] border-ink rotate-45 hidden lg:block" />
+        <div className="absolute bottom-24 left-1/4 h-4 w-4 rounded-full bg-secondary border-[2px] border-ink hidden lg:block" />
+
+        <div className="container relative pt-12 md:pt-16 pb-0">
+          {/* Top row: tag + meta */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-accent text-ink text-xs font-extrabold uppercase">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              </span>
+              v1.0 · AI illustration engine
             </div>
-            <h1 className="heading-display text-5xl sm:text-6xl lg:text-7xl text-ink text-balance">
-              Turn your <span className="text-primary">ideas</span> into stunning <span className="text-secondary">illustrations</span>.
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-              Creonix transforms your prompts into professional illustrations in any style.
-              Built for designers who move fast.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link
-                to="/auth?mode=signup"
-                className="inline-flex items-center gap-2 px-6 py-4 bg-primary text-primary-foreground font-extrabold uppercase bauhaus-border hover-lift"
-              >
-                Start Creating Free <ArrowRight size={18} />
-              </Link>
-              <a
-                href="#how"
-                className="inline-flex items-center gap-2 px-6 py-4 bg-background text-ink font-extrabold uppercase bauhaus-border hover-lift"
-              >
-                How it works
-              </a>
-            </div>
-            <div className="mt-8 flex items-center gap-6 text-xs font-bold uppercase text-muted-foreground">
-              <span>12 styles</span>
-              <span className="h-4 w-px bg-ink/30" />
-              <span>SVG · PNG · JPEG</span>
-              <span className="h-4 w-px bg-ink/30" />
-              <span>No credit card</span>
+            <div className="flex items-center gap-3 text-xs font-extrabold uppercase">
+              <div className="flex -space-x-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={14} className="fill-accent text-ink" strokeWidth={2.5} />
+                ))}
+              </div>
+              <span className="text-ink">2,400+ designers shipping daily</span>
             </div>
           </div>
 
-          {/* Visual block */}
-          <div className="relative">
-            <div className="relative bg-secondary bauhaus-border-thick bauhaus-shadow-lg aspect-[5/4] overflow-hidden">
-              <div className="absolute inset-0 dot-pattern opacity-20" />
-              {/* geometric composition */}
-              <div className="absolute top-8 left-8 h-28 w-28 rounded-full bg-accent border-[3px] border-ink" />
-              <div
-                className="absolute bottom-12 left-16 h-44 w-44 bg-primary border-[3px] border-ink"
-              />
-              <div
-                className="absolute top-10 right-10 h-56 w-56 bg-background border-[3px] border-ink"
-                style={{ clipPath: "polygon(50% 0, 100% 100%, 0 100%)" }}
-              />
-              <div className="absolute bottom-8 right-8 h-20 w-20 bg-ink rotate-45 border-[3px] border-ink" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background border-[3px] border-ink" />
+          {/* Headline — massive, asymmetric */}
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div className="lg:col-span-8 relative">
+              <h1 className="heading-display text-[clamp(3rem,9vw,8.5rem)] text-ink leading-[0.85] text-balance">
+                <span className="block">DESIGN</span>
+                <span className="block">
+                  AT THE
+                  <span className="inline-flex items-center mx-3 md:mx-5 align-middle">
+                    <span className="relative inline-block bg-primary text-primary-foreground bauhaus-border-thick px-4 md:px-6 py-1 -rotate-2 bauhaus-shadow">
+                      SPEED
+                    </span>
+                  </span>
+                </span>
+                <span className="block">
+                  OF <span className="text-secondary italic">THOUGHT.</span>
+                </span>
+              </h1>
             </div>
-            {/* Decorative floating chip */}
-            <div className="hidden md:flex absolute -bottom-5 -left-5 items-center gap-2 px-3 py-2 bg-background bauhaus-border bauhaus-shadow text-xs font-extrabold uppercase">
-              <Sparkles size={14} className="text-primary" /> Generated in seconds
+
+            {/* Right column: featured visual stack */}
+            <div className="lg:col-span-4 relative min-h-[280px] lg:min-h-[420px]">
+              {/* Card 1 — back */}
+              <div
+                className="absolute top-0 right-8 w-[60%] aspect-square bauhaus-border-thick overflow-hidden bg-secondary"
+                style={{ transform: "rotate(-6deg)" }}
+              >
+                <img
+                  src={STYLE_IMAGES[heroStyles[0]]}
+                  alt="Psychedelic style preview"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              </div>
+              {/* Card 2 — middle */}
+              <div
+                className="absolute top-12 right-0 w-[55%] aspect-square bauhaus-border-thick overflow-hidden bg-accent"
+                style={{ transform: "rotate(4deg)" }}
+              >
+                <img
+                  src={STYLE_IMAGES[heroStyles[1]]}
+                  alt="3D Clay style preview"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              </div>
+              {/* Card 3 — front */}
+              <div
+                className="absolute bottom-0 right-12 w-[65%] aspect-[4/5] bauhaus-border-thick bauhaus-shadow-lg overflow-hidden bg-primary"
+                style={{ transform: "rotate(-2deg)" }}
+              >
+                <img
+                  src={STYLE_IMAGES[heroStyles[2]]}
+                  alt="Isometric style preview"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+                <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-ink text-ink-foreground text-[10px] font-extrabold uppercase flex items-center justify-between">
+                  <span>Isometric</span>
+                  <Zap size={12} className="text-accent" />
+                </div>
+              </div>
+              {/* Floating sparkle chip */}
+              <div className="absolute -top-2 -left-2 lg:left-0 hidden md:flex items-center gap-2 px-3 py-2 bg-background bauhaus-border bauhaus-shadow text-xs font-extrabold uppercase z-10">
+                <Sparkles size={14} className="text-primary" /> ~6s avg
+              </div>
+            </div>
+          </div>
+
+          {/* Sub copy + CTAs row */}
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 mt-12 items-end">
+            <div className="lg:col-span-5">
+              <div className="flex items-start gap-3">
+                <div className="h-1.5 w-12 bg-primary mt-3 shrink-0" />
+                <p className="text-lg md:text-xl text-ink/80 font-medium">
+                  Type a prompt. Pick a style. Ship in seconds.
+                  <span className="block text-muted-foreground text-base mt-1 font-normal">
+                    Twelve hand-tuned aesthetics, infinite directions — no design degree required.
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 flex flex-wrap gap-3">
+              <Link
+                to="/auth?mode=signup"
+                className="group inline-flex items-center gap-2 px-6 py-4 bg-ink text-ink-foreground font-extrabold uppercase bauhaus-border hover-lift text-sm"
+              >
+                Start free
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+              <a
+                href="#styles"
+                className="inline-flex items-center gap-2 px-6 py-4 bg-background text-ink font-extrabold uppercase bauhaus-border hover-lift text-sm"
+              >
+                See styles
+              </a>
+            </div>
+
+            <div className="lg:col-span-3 lg:text-right">
+              <div className="inline-block bauhaus-border bg-accent px-4 py-3">
+                <div className="font-mono text-[10px] font-bold uppercase opacity-70">No card · Free tier</div>
+                <div className="heading-display text-2xl mt-1">START IN 30s</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* corner accents */}
-        <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-accent border-[3px] border-ink hidden md:block" />
+        {/* Marquee ticker */}
+        <div className="mt-14 border-t-[3px] border-ink bg-ink text-ink-foreground overflow-hidden">
+          <div className="flex gap-10 py-4 whitespace-nowrap animate-marquee">
+            {[...Array(2)].map((_, dup) => (
+              <div key={dup} className="flex gap-10 items-center shrink-0">
+                {[
+                  "FLAT 2.0",
+                  "ISOMETRIC",
+                  "3D CLAY",
+                  "GLASSMORPHISM",
+                  "RETRO REVIVAL",
+                  "PSYCHEDELIC",
+                  "CARTOON",
+                  "DIGITAL COLLAGE",
+                  "NATURE / ECO",
+                  "HAND-DRAWN",
+                  "DOODLE",
+                  "FOLK ART",
+                ].map((t) => (
+                  <div key={t} className="flex items-center gap-10 shrink-0">
+                    <span className="heading-display text-2xl md:text-3xl">{t}</span>
+                    <span className="h-3 w-3 rounded-full bg-accent shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* HOW IT WORKS */}
