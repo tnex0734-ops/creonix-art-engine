@@ -123,4 +123,19 @@
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 0 hsl(var(--ink));
   }
+
+  /* Visible chunky scrollbar for the styles showcase row */
+  .style-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--ink)) transparent;
+  }
+  .style-scroll::-webkit-scrollbar { height: 10px; }
+  .style-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    border-top: 2px solid hsl(var(--ink));
+  }
+  .style-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--ink));
+    border: 2px solid hsl(var(--ink));
+  }
 }

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { STYLES } from "@/lib/styles";
-import { StylePreview } from "@/components/StylePreview";
+import { StyleCard } from "@/components/StyleCard";
 import { ArrowRight, Sparkles, Type, Download } from "lucide-react";
 
 const Landing = () => {
@@ -99,25 +99,29 @@ const Landing = () => {
       </section>
 
       {/* STYLES SHOWCASE */}
-      <section id="styles" className="py-20 border-b-[3px] border-ink bg-muted/40">
+      <section id="styles" className="py-20 border-b-[3px] border-ink" style={{ background: "#F5F2EE" }}>
         <div className="container">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
             <div>
               <h2 className="heading-display text-4xl md:text-5xl">12 Distinctive styles</h2>
-              <p className="text-muted-foreground mt-2 max-w-lg">From clean flat to wild psychedelic — pick the look that fits your brief.</p>
+              <p className="text-muted-foreground mt-2 max-w-lg">
+                From clean flat to wild psychedelic — pick the look that fits your brief.
+              </p>
             </div>
-            <Link to="/auth?mode=signup" className="px-5 py-3 bg-ink text-ink-foreground font-extrabold uppercase text-sm bauhaus-border hover-lift">
-              Try them all →
+            <Link
+              to="/generate"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-ink text-ink-foreground font-extrabold uppercase text-sm bauhaus-border hover-lift"
+            >
+              Try them all <ArrowRight size={16} />
             </Link>
           </div>
         </div>
-        {/* horizontal scroll */}
-        <div className="overflow-x-auto pb-4">
+        {/* horizontal scroll with visible scrollbar */}
+        <div className="overflow-x-auto pb-6 style-scroll">
           <div className="flex gap-5 px-[max(1.25rem,calc((100vw-1400px)/2+1.25rem))] min-w-max">
             {STYLES.map((s) => (
-              <div key={s.name} className="w-56 flex-shrink-0">
-                <StylePreview style={s} />
-                <div className="mt-2 font-extrabold uppercase text-sm">{s.name}</div>
+              <div key={s.name} className="flex-shrink-0">
+                <StyleCard style={s} size="lg" />
               </div>
             ))}
           </div>
