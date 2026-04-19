@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { STYLES } from "@/lib/styles";
@@ -9,6 +10,33 @@ import { ArrowRight, Sparkles, Type, Download, Star, Zap } from "lucide-react";
 const Landing = () => {
   // Pick 3 featured styles for the hero collage
   const heroStyles = ["Psychedelic", "3D Clay", "Isometric"];
+
+  // Parallax / mouse-tilt for hero card stack
+  const tiltRef = useRef<HTMLDivElement>(null);
+  // Each card: [baseRotateDeg, parallaxStrength (px), tiltStrength (deg)]
+  const cardConfigs: Array<[number, number, number]> = [
+    [-6, 14, 6],  // back
+    [4, 22, 8],   // middle
+    [-2, 32, 10], // front
+  ];
+
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = tiltRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    // normalized -1..1
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    el.style.setProperty("--mx", nx.toFixed(3));
+    el.style.setProperty("--my", ny.toFixed(3));
+  };
+
+  const handleTiltLeave = () => {
+    const el = tiltRef.current;
+    if (!el) return;
+    el.style.setProperty("--mx", "0");
+    el.style.setProperty("--my", "0");
+  };
 
   return (
     <div className="min-h-screen bg-background">
