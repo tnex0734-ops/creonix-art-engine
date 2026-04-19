@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { STYLES } from "@/lib/styles";
@@ -9,6 +10,33 @@ import { ArrowRight, Sparkles, Type, Download, Star, Zap } from "lucide-react";
 const Landing = () => {
   // Pick 3 featured styles for the hero collage
   const heroStyles = ["Psychedelic", "3D Clay", "Isometric"];
+
+  // Parallax / mouse-tilt for hero card stack
+  const tiltRef = useRef<HTMLDivElement>(null);
+  // Each card: [baseRotateDeg, parallaxStrength (px), tiltStrength (deg)]
+  const cardConfigs: Array<[number, number, number]> = [
+    [-6, 14, 6],  // back
+    [4, 22, 8],   // middle
+    [-2, 32, 10], // front
+  ];
+
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = tiltRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    // normalized -1..1
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    el.style.setProperty("--mx", nx.toFixed(3));
+    el.style.setProperty("--my", ny.toFixed(3));
+  };
+
+  const handleTiltLeave = () => {
+    const el = tiltRef.current;
+    if (!el) return;
+    el.style.setProperty("--mx", "0");
+    el.style.setProperty("--my", "0");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,12 +98,20 @@ const Landing = () => {
               </h1>
             </div>
 
-            {/* Right column: featured visual stack */}
-            <div className="lg:col-span-4 relative min-h-[280px] lg:min-h-[420px]">
+            {/* Right column: featured visual stack with mouse-tilt parallax */}
+            <div
+              ref={tiltRef}
+              onMouseMove={handleTiltMove}
+              onMouseLeave={handleTiltLeave}
+              className="lg:col-span-4 relative min-h-[280px] lg:min-h-[420px] [perspective:1200px]"
+              style={{ ["--mx" as never]: 0, ["--my" as never]: 0 } as React.CSSProperties}
+            >
               {/* Card 1 — back */}
               <div
-                className="absolute top-0 right-8 w-[60%] aspect-square bauhaus-border-thick overflow-hidden bg-secondary"
-                style={{ transform: "rotate(-6deg)" }}
+                className="absolute top-0 right-8 w-[60%] aspect-square bauhaus-border-thick overflow-hidden bg-secondary transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
+                style={{
+                  transform: `translate3d(calc(var(--mx) * ${cardConfigs[0][1]}px), calc(var(--my) * ${cardConfigs[0][1]}px), 0) rotate(${cardConfigs[0][0]}deg) rotateY(calc(var(--mx) * ${cardConfigs[0][2]}deg)) rotateX(calc(var(--my) * ${-cardConfigs[0][2]}deg))`,
+                }}
               >
                 <img
                   src={STYLE_IMAGES[heroStyles[0]]}
@@ -86,8 +122,10 @@ const Landing = () => {
               </div>
               {/* Card 2 — middle */}
               <div
-                className="absolute top-12 right-0 w-[55%] aspect-square bauhaus-border-thick overflow-hidden bg-accent"
-                style={{ transform: "rotate(4deg)" }}
+                className="absolute top-12 right-0 w-[55%] aspect-square bauhaus-border-thick overflow-hidden bg-accent transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
+                style={{
+                  transform: `translate3d(calc(var(--mx) * ${cardConfigs[1][1]}px), calc(var(--my) * ${cardConfigs[1][1]}px), 0) rotate(${cardConfigs[1][0]}deg) rotateY(calc(var(--mx) * ${cardConfigs[1][2]}deg)) rotateX(calc(var(--my) * ${-cardConfigs[1][2]}deg))`,
+                }}
               >
                 <img
                   src={STYLE_IMAGES[heroStyles[1]]}
@@ -98,8 +136,10 @@ const Landing = () => {
               </div>
               {/* Card 3 — front */}
               <div
-                className="absolute bottom-0 right-12 w-[65%] aspect-[4/5] bauhaus-border-thick bauhaus-shadow-lg overflow-hidden bg-primary"
-                style={{ transform: "rotate(-2deg)" }}
+                className="absolute bottom-0 right-12 w-[65%] aspect-[4/5] bauhaus-border-thick bauhaus-shadow-lg overflow-hidden bg-primary transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
+                style={{
+                  transform: `translate3d(calc(var(--mx) * ${cardConfigs[2][1]}px), calc(var(--my) * ${cardConfigs[2][1]}px), 0) rotate(${cardConfigs[2][0]}deg) rotateY(calc(var(--mx) * ${cardConfigs[2][2]}deg)) rotateX(calc(var(--my) * ${-cardConfigs[2][2]}deg))`,
+                }}
               >
                 <img
                   src={STYLE_IMAGES[heroStyles[2]]}
