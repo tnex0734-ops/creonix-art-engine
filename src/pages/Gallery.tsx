@@ -4,7 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { STYLES } from "@/lib/styles";
-import { Download, Plus, Trash2 } from "lucide-react";
+import { DownloadDropdown } from "@/components/DownloadDropdown";
+import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Generation = {
@@ -51,27 +52,24 @@ const Gallery = () => {
     toast.success("Deleted");
   };
 
-  const download = (g: Generation) => {
-    const a = document.createElement("a");
-    a.href = g.image_url;
-    a.download = `creonix-${g.id}.png`;
-    a.target = "_blank";
-    a.click();
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <section className="container py-12">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-secondary text-secondary-foreground text-xs font-extrabold uppercase mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-secondary text-secondary-foreground text-xs font-extrabold uppercase mb-3 rounded-2xl">
               Gallery
             </div>
             <h1 className="heading-display text-5xl md:text-6xl">Your creations</h1>
-            <p className="mt-3 text-muted-foreground">{items.length} illustration{items.length === 1 ? "" : "s"} so far.</p>
+            <p className="mt-3 text-muted-foreground">
+              {items.length} illustration{items.length === 1 ? "" : "s"} so far.
+            </p>
           </div>
-          <Link to="/generate" className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-primary-foreground font-extrabold uppercase bauhaus-border hover-lift">
+          <Link
+            to="/generate"
+            className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-primary-foreground font-extrabold uppercase bauhaus-border hover-lift rounded-2xl"
+          >
             <Plus size={16} /> New illustration
           </Link>
         </div>
@@ -88,22 +86,25 @@ const Gallery = () => {
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="aspect-square bauhaus-border bg-muted animate-pulse" />
+              <div key={i} className="aspect-square bauhaus-border bg-muted animate-pulse rounded-2xl" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bauhaus-border-thick p-14 bg-card text-center">
+          <div className="bauhaus-border-thick p-14 bg-card text-center rounded-2xl">
             <h3 className="heading-display text-2xl">Nothing here yet</h3>
             <p className="text-muted-foreground mt-2">Create your first illustration to fill this gallery.</p>
-            <Link to="/generate" className="inline-flex items-center gap-2 mt-6 px-5 py-3 bg-primary text-primary-foreground font-extrabold uppercase bauhaus-border hover-lift">
+            <Link
+              to="/generate"
+              className="inline-flex items-center gap-2 mt-6 px-5 py-3 bg-primary text-primary-foreground font-extrabold uppercase bauhaus-border hover-lift rounded-2xl"
+            >
               <Plus size={16} /> Start Creating
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filtered.map((g) => (
-              <article key={g.id} className="bauhaus-border bg-card overflow-hidden hover-lift">
-                <div className="aspect-square bg-muted overflow-hidden">
+              <article key={g.id} className="bauhaus-border bg-card overflow-hidden hover-lift rounded-2xl">
+                <div className="aspect-square bg-muted overflow-hidden rounded-t-[14px]">
                   <img src={g.image_url} alt={g.prompt} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div className="p-3 border-t-[3px] border-ink">
@@ -114,12 +115,20 @@ const Gallery = () => {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2lh]">{g.prompt}</p>
-                  <div className="flex gap-2 mt-3">
-                    <button onClick={() => download(g)} className="flex-1 px-2 py-1.5 bauhaus-border bg-background hover:bg-accent text-[10px] font-extrabold uppercase inline-flex items-center justify-center gap-1">
-                      <Download size={12} /> Save
-                    </button>
-                    <button onClick={() => remove(g.id)} className="px-2 py-1.5 bauhaus-border bg-background hover:bg-destructive hover:text-destructive-foreground" aria-label="Delete">
-                      <Trash2 size={12} />
+                  <div className="flex gap-2 mt-3 items-center">
+                    <DownloadDropdown
+                      imageUrl={g.image_url}
+                      filenameBase={`creonix-${g.id}`}
+                      variant="primary"
+                      align="left"
+                      className="flex-1"
+                    />
+                    <button
+                      onClick={() => remove(g.id)}
+                      className="p-2 bauhaus-border bg-background hover:bg-destructive hover:text-destructive-foreground rounded-lg"
+                      aria-label="Delete"
+                    >
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
@@ -135,7 +144,9 @@ const Gallery = () => {
 const FilterPill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 bauhaus-border text-xs font-extrabold uppercase hover-lift ${active ? "bg-ink text-ink-foreground" : "bg-background"}`}
+    className={`px-4 py-2 bauhaus-border text-xs font-extrabold uppercase hover-lift rounded-full ${
+      active ? "bg-ink text-ink-foreground" : "bg-background"
+    }`}
   >
     {label}
   </button>
