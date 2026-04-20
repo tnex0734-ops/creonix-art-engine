@@ -135,6 +135,15 @@
   }
   .animate-marquee:hover { animation-play-state: paused; }
 
+  /* Custom Bauhaus cursor */
+  @media (pointer: fine) {
+    html.creonix-cursor-on,
+    html.creonix-cursor-on body,
+    html.creonix-cursor-on * {
+      cursor: none !important;
+    }
+  }
+
   /* Visible chunky scrollbar for the styles showcase row */
   .style-scroll {
     scrollbar-width: thin;

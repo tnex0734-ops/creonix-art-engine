@@ -10,6 +10,8 @@ import Generate from "./pages/Generate.tsx";
 import Gallery from "./pages/Gallery.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AuthGateProvider } from "@/hooks/useAuthGate";
+import { CustomCursor } from "@/components/CustomCursor";
 
 const queryClient = new QueryClient();
 
@@ -19,14 +21,17 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/generate" element={<ProtectedRoute><Generate /></ProtectedRoute>} />
-          <Route path="/gallery" element={<ProtectedRoute><Gallery /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthGateProvider>
+          <CustomCursor />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/generate" element={<ProtectedRoute><Generate /></ProtectedRoute>} />
+            <Route path="/gallery" element={<ProtectedRoute><Gallery /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthGateProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

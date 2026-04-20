@@ -6,16 +6,20 @@ type Props = {
   style: Style;
   selected?: boolean;
   onSelect?: (s: Style) => void;
-  size?: "sm" | "md" | "lg";
-  rounded?: boolean;
+  size?: "sm" | "md" | "lg" | "compact";
 };
 
-export const StyleCard = ({ style, selected = false, onSelect, size = "md", rounded = false }: Props) => {
+export const StyleCard = ({ style, selected = false, onSelect, size = "md" }: Props) => {
   const Preview = STYLE_PREVIEWS[style.name];
   const image = STYLE_IMAGES[style.name];
   const dims =
-    size === "lg" ? "w-[280px] h-[280px]" : size === "sm" ? "w-[180px] h-[180px]" : "w-full aspect-square";
-  const roundedCls = rounded || style.name === "3D Clay" ? "rounded-2xl" : "";
+    size === "lg"
+      ? "w-[280px] h-[280px]"
+      : size === "sm"
+      ? "w-[180px] h-[180px]"
+      : size === "compact"
+      ? "w-[140px] h-[170px]"
+      : "w-full aspect-square";
 
   return (
     <button
@@ -23,7 +27,7 @@ export const StyleCard = ({ style, selected = false, onSelect, size = "md", roun
       onClick={() => onSelect?.(style)}
       aria-label={`Select ${style.name} illustration style`}
       aria-pressed={selected}
-      className={`group relative flex flex-col bg-background overflow-hidden transition-all duration-200 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 ${dims} ${roundedCls} ${
+      className={`group relative flex flex-col bg-background overflow-hidden rounded-2xl transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[6px_6px_0_0_hsl(var(--ink))] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 ${dims} ${
         selected
           ? "border-[3px] border-primary"
           : "border-[2px] border-ink hover:border-ink"
@@ -31,7 +35,10 @@ export const StyleCard = ({ style, selected = false, onSelect, size = "md", roun
       style={{ minHeight: 44, minWidth: 44 }}
     >
       {/* Top 75%: photographic reference + SVG decorative overlay */}
-      <div className={`relative w-full overflow-hidden bg-muted ${roundedCls ? "rounded-t-2xl" : ""}`} style={{ height: "75%" }}>
+      <div
+        className="relative w-full overflow-hidden bg-muted rounded-t-[14px]"
+        style={{ height: "75%" }}
+      >
         {image ? (
           <img
             src={image}
