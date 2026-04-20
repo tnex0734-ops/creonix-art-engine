@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,8 +6,13 @@ import { STYLES } from "@/lib/styles";
 import { StyleCard } from "@/components/StyleCard";
 import { STYLE_IMAGES } from "@/components/style-previews/styleImages";
 import { ArrowRight, Sparkles, Type, Download, Star, Zap } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useAuthGate } from "@/hooks/useAuthGate";
 
 const Landing = () => {
+  const { user } = useAuth();
+  const { requireAuth } = useAuthGate();
+  const navigate = useNavigate();
   // Pick 3 featured styles for the hero collage
   const heroStyles = ["Psychedelic", "3D Clay", "Isometric"];
 
@@ -173,20 +178,30 @@ const Landing = () => {
               </div>
             </div>
 
-            <div className="lg:col-span-4 flex flex-wrap gap-3">
-              <Link
-                to="/auth?mode=signup"
-                className="group inline-flex items-center gap-2 px-6 py-4 bg-ink text-ink-foreground font-extrabold uppercase bauhaus-border hover-lift text-sm"
-              >
-                Start free
-                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-              </Link>
+            <div className="lg:col-span-4 flex flex-wrap gap-3 items-center">
               <a
                 href="#styles"
-                className="inline-flex items-center gap-2 px-6 py-4 bg-background text-ink font-extrabold uppercase bauhaus-border hover-lift text-sm"
+                className="inline-flex items-center gap-2 px-7 py-4 bg-background text-ink font-extrabold uppercase border-[2px] border-ink hover-lift text-sm rounded-2xl"
               >
-                See styles
+                See Styles
               </a>
+              <Link
+                to="/generate"
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    requireAuth(() => navigate("/generate"), "create an illustration");
+                  }
+                }}
+                className="group inline-flex items-center gap-3 px-10 py-4 bg-primary text-primary-foreground font-extrabold uppercase border-[2px] border-ink hover-lift text-sm rounded-2xl"
+              >
+                <span className="relative inline-flex h-2 w-2" aria-hidden>
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+                </span>
+                Start Here
+                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
             </div>
 
             <div className="lg:col-span-3 lg:text-right">
@@ -291,8 +306,14 @@ const Landing = () => {
               Start free. Generate your first illustration in under a minute.
             </p>
             <Link
-              to="/auth?mode=signup"
-              className="relative inline-flex items-center gap-2 mt-8 px-6 py-4 bg-background text-ink font-extrabold uppercase bauhaus-border hover-lift"
+              to="/generate"
+              onClick={(e) => {
+                if (!user) {
+                  e.preventDefault();
+                  requireAuth(() => navigate("/generate"), "create an illustration");
+                }
+              }}
+              className="relative inline-flex items-center gap-2 mt-8 px-6 py-4 bg-background text-ink font-extrabold uppercase bauhaus-border hover-lift rounded-2xl"
             >
               Start Creating Free <ArrowRight size={18} />
             </Link>

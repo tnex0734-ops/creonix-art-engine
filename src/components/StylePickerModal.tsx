@@ -105,7 +105,7 @@ export const StylePickerModal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="style-picker-title"
-        className="bg-background bauhaus-border-thick max-w-5xl w-full my-8 bauhaus-shadow-lg flex flex-col max-h-[90vh]"
+        className="bg-background bauhaus-border-thick max-w-5xl w-full my-8 bauhaus-shadow-lg flex flex-col max-h-[90vh] rounded-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
