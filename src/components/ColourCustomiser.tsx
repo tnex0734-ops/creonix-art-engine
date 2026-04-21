@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { RotateCcw, X, Pipette } from "lucide-react";
 import { PALETTE_PRESETS } from "@/lib/styles";
 
 export type ElementColors = {
@@ -16,168 +16,16 @@ export const DEFAULT_COLORS: ElementColors = {
   outline: "#111111",
 };
 
-const ELEMENT_LABELS: Array<{ key: keyof ElementColors; label: string }> = [
-  { key: "background", label: "Background" },
-  { key: "primary", label: "Primary Shape" },
-  { key: "accent", label: "Accent" },
-  { key: "outline", label: "Outline" },
+const ELEMENTS: Array<{ key: keyof ElementColors; label: string; icon: string }> = [
+  { key: "background", label: "BG", icon: "◻" },
+  { key: "primary", label: "Primary", icon: "●" },
+  { key: "accent", label: "Accent", icon: "▲" },
+  { key: "outline", label: "Outline", icon: "━" },
 ];
 
-/* ── tiny hex helpers ── */
 const isValidHex = (v: string) => /^#[0-9a-fA-F]{6}$/.test(v);
 
-/* ── Colour swatch + native picker + hex input ── */
-const ColourRow = ({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) => {
-  const pickerRef = useRef<HTMLInputElement>(null);
-  const [hex, setHex] = useState(value);
-
-  // sync external changes
-  if (value !== hex && isValidHex(value)) {
-    setHex(value);
-  }
-
-  const handleHexChange = (raw: string) => {
-    let v = raw.startsWith("#") ? raw : `#${raw}`;
-    v = v.slice(0, 7);
-    setHex(v);
-    if (isValidHex(v)) onChange(v);
-  };
-
-  return (
-    <div className="flex items-center gap-3 p-2.5 bauhaus-border bg-background rounded-xl">
-      <span className="text-xs font-extrabold uppercase flex-shrink-0 w-28">
-        {label}
-      </span>
-
-      {/* Clickable swatch → opens native colour picker */}
-      <button
-        type="button"
-        onClick={() => pickerRef.current?.click()}
-        className="h-8 w-8 flex-shrink-0 border-[2px] border-ink rounded-lg relative overflow-hidden group"
-        style={{ background: value }}
-        aria-label={`Pick ${label} colour`}
-      >
-        <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-      </button>
-
-      {/* Hidden native colour picker */}
-      <input
-        ref={pickerRef}
-        type="color"
-        value={value}
-        onChange={(e) => {
-          onChange(e.target.value);
-          setHex(e.target.value);
-        }}
-        className="absolute w-0 h-0 opacity-0 pointer-events-none"
-        tabIndex={-1}
-      />
-
-      {/* Hex input */}
-      <input
-        type="text"
-        value={hex}
-        onChange={(e) => handleHexChange(e.target.value)}
-        onBlur={() => {
-          if (!isValidHex(hex)) setHex(value);
-        }}
-        maxLength={7}
-        className="w-[5.5rem] px-2 py-1.5 text-xs font-mono font-bold uppercase bg-muted border-[2px] border-ink rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
-        placeholder="#000000"
-      />
-    </div>
-  );
-};
-
-/* ── Colour wheel (HSL ring + brightness) ── */
-const ColourWheel = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (hex: string) => void;
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const size = 160;
-  const center = size / 2;
-  const outerR = size / 2 - 4;
-  const innerR = outerR - 22;
-
-  const drawWheel = useCallback(
-    (ctx: CanvasRenderingContext2D) => {
-      ctx.clearRect(0, 0, size, size);
-      // Draw hue ring
-      for (let angle = 0; angle < 360; angle++) {
-        const startAngle = ((angle - 1) * Math.PI) / 180;
-        const endAngle = ((angle + 1) * Math.PI) / 180;
-        ctx.beginPath();
-        ctx.arc(center, center, (outerR + innerR) / 2, startAngle, endAngle);
-        ctx.lineWidth = outerR - innerR;
-        ctx.strokeStyle = `hsl(${angle}, 100%, 50%)`;
-        ctx.stroke();
-      }
-    },
-    [center, outerR, innerR]
-  );
-
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvasRef.current!.getBoundingClientRect();
-    const x = e.clientX - rect.left - center;
-    const y = e.clientY - rect.top - center;
-    const dist = Math.sqrt(x * x + y * y);
-
-    if (dist >= innerR && dist <= outerR) {
-      let angle = (Math.atan2(y, x) * 180) / Math.PI;
-      if (angle < 0) angle += 360;
-      const hue = Math.round(angle);
-      // Convert HSL to hex
-      const hex = hslToHex(hue, 100, 50);
-      onChange(hex);
-    }
-  };
-
-  // Draw on mount
-  const canvasCallback = useCallback(
-    (node: HTMLCanvasElement | null) => {
-      if (!node) return;
-      (canvasRef as any).current = node;
-      const ctx = node.getContext("2d");
-      if (ctx) drawWheel(ctx);
-    },
-    [drawWheel]
-  );
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <canvas
-        ref={canvasCallback}
-        width={size}
-        height={size}
-        onClick={handleCanvasClick}
-        className="cursor-crosshair"
-        style={{ width: size, height: size }}
-      />
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] font-extrabold uppercase text-muted-foreground">
-          Click ring to pick hue
-        </span>
-        <span
-          className="h-5 w-5 border-[2px] border-ink rounded"
-          style={{ background: value }}
-        />
-      </div>
-    </div>
-  );
-};
-
+/* ── HSL ↔ Hex helpers ── */
 function hslToHex(h: number, s: number, l: number): string {
   s /= 100;
   l /= 100;
@@ -185,14 +33,228 @@ function hslToHex(h: number, s: number, l: number): string {
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
     const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color)
-      .toString(16)
-      .padStart(2, "0");
+    return Math.round(255 * color).toString(16).padStart(2, "0");
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-/* ── Main component ── */
+function hexToHsl(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break;
+      case g: h = ((b - r) / d + 2) * 60; break;
+      case b: h = ((r - g) / d + 4) * 60; break;
+    }
+  }
+  return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+}
+
+/* ── Circular Hue+Saturation Wheel with Canvas ── */
+const HueSatWheel = ({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (hex: string) => void;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const size = 180;
+  const center = size / 2;
+  const radius = size / 2 - 6;
+  const [dragging, setDragging] = useState(false);
+
+  const [h, s, l] = hexToHsl(value);
+
+  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, size, size);
+    // Draw filled color wheel
+    for (let angle = 0; angle < 360; angle += 1) {
+      for (let r = 0; r <= radius; r += 2) {
+        const rad = (angle * Math.PI) / 180;
+        const x = center + r * Math.cos(rad);
+        const y = center + r * Math.sin(rad);
+        const sat = (r / radius) * 100;
+        ctx.fillStyle = `hsl(${angle}, ${sat}%, 50%)`;
+        ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+      }
+    }
+  }, [center, radius]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (ctx) draw(ctx);
+  }, [draw]);
+
+  const pickFromXY = (clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left - center;
+    const y = clientY - rect.top - center;
+    const dist = Math.sqrt(x * x + y * y);
+    if (dist > radius + 4) return;
+    let angle = (Math.atan2(y, x) * 180) / Math.PI;
+    if (angle < 0) angle += 360;
+    const sat = Math.min(100, (dist / radius) * 100);
+    onChange(hslToHex(Math.round(angle), Math.round(sat), l || 50));
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    setDragging(true);
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    pickFromXY(e.clientX, e.clientY);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragging) return;
+    pickFromXY(e.clientX, e.clientY);
+  };
+  const onPointerUp = () => setDragging(false);
+
+  // Indicator position
+  const indicatorAngle = (h * Math.PI) / 180;
+  const indicatorDist = (s / 100) * radius;
+  const ix = center + indicatorDist * Math.cos(indicatorAngle);
+  const iy = center + indicatorDist * Math.sin(indicatorAngle);
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <canvas
+        ref={canvasRef}
+        width={size}
+        height={size}
+        className="cursor-crosshair rounded-full"
+        style={{ width: size, height: size }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+      />
+      {/* Indicator ring */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          left: ix - 8,
+          top: iy - 8,
+          width: 16,
+          height: 16,
+          borderRadius: "50%",
+          border: "3px solid #111",
+          boxShadow: "0 0 0 2px #fff, 0 2px 8px rgba(0,0,0,0.3)",
+          background: value,
+        }}
+      />
+    </div>
+  );
+};
+
+/* ── Lightness Slider ── */
+const LightnessSlider = ({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (hex: string) => void;
+}) => {
+  const [h, s, l] = hexToHsl(value);
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <div className="flex items-center justify-between">
+        <span className="text-[9px] font-extrabold uppercase text-muted-foreground tracking-wider">Lightness</span>
+        <span className="text-[9px] font-mono font-bold text-muted-foreground">{l}%</span>
+      </div>
+      <div className="relative h-5 rounded-lg overflow-hidden border-[2px] border-ink">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(to right, hsl(${h},${s}%,0%), hsl(${h},${s}%,50%), hsl(${h},${s}%,100%))`,
+          }}
+        />
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={l}
+          onChange={(e) => onChange(hslToHex(h, s, Number(e.target.value)))}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+        {/* Thumb indicator */}
+        <div
+          className="absolute top-0 bottom-0 w-1 bg-ink pointer-events-none"
+          style={{ left: `calc(${l}% - 2px)` }}
+        >
+          <div className="absolute -top-0.5 -bottom-0.5 -left-1 -right-1 border-2 border-foreground rounded-sm bg-background" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── Hex Input ── */
+const HexInput = ({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (hex: string) => void;
+}) => {
+  const [text, setText] = useState(value);
+  const pickerRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isValidHex(value)) setText(value);
+  }, [value]);
+
+  const commit = (raw: string) => {
+    let v = raw.startsWith("#") ? raw : `#${raw}`;
+    v = v.slice(0, 7);
+    setText(v);
+    if (isValidHex(v)) onChange(v);
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <button
+        type="button"
+        onClick={() => pickerRef.current?.click()}
+        className="h-7 w-7 flex-shrink-0 border-[2px] border-ink rounded-md relative overflow-hidden group cursor-pointer"
+        style={{ background: value }}
+        aria-label="Open color picker"
+      >
+        <Pipette size={10} className="absolute inset-0 m-auto text-white opacity-0 group-hover:opacity-80 transition-opacity drop-shadow-md" />
+      </button>
+      <input
+        ref={pickerRef}
+        type="color"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setText(e.target.value);
+        }}
+        className="absolute w-0 h-0 opacity-0 pointer-events-none"
+        tabIndex={-1}
+      />
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => commit(e.target.value)}
+        onBlur={() => { if (!isValidHex(text)) setText(value); }}
+        maxLength={7}
+        className="w-[4.5rem] px-1.5 py-1 text-[11px] font-mono font-bold uppercase bg-muted border-[2px] border-ink rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
+      />
+    </div>
+  );
+};
+
+/* ── Main ColourCustomiser ── */
 export const ColourCustomiser = ({
   colors,
   setColors,
@@ -208,94 +270,104 @@ export const ColourCustomiser = ({
 
   const applyPreset = (p: string[]) => {
     setColors({
-      background: p[4] ?? colors.background,
       primary: p[0] ?? colors.primary,
       accent: p[2] ?? colors.accent,
       outline: p[3] ?? colors.outline,
+      background: p[4] ?? colors.background,
     });
   };
 
   return (
-    <div className="bg-card border-t-[3px] border-ink p-5 max-h-[60%] overflow-y-auto rounded-t-2xl">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="heading-display text-lg">Customise colours</h4>
+    <div className="bg-card border-t-[3px] border-ink rounded-t-2xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b-[2px] border-ink bg-muted/50">
         <div className="flex items-center gap-2">
+          <div className="h-5 w-5 rounded-full bg-primary border-[2px] border-ink" />
+          <h4 className="text-sm font-extrabold uppercase tracking-wide">Colours</h4>
+        </div>
+        <div className="flex items-center gap-1.5">
           <button
             onClick={onReset}
-            className="text-xs font-extrabold uppercase inline-flex items-center gap-1 hover:text-primary"
+            className="px-2 py-1 text-[10px] font-extrabold uppercase inline-flex items-center gap-1 hover:text-primary transition-colors rounded-md"
           >
-            <RotateCcw size={12} /> Reset
+            <RotateCcw size={10} /> Reset
           </button>
           <button
             onClick={onClose}
-            className="px-2 py-1 bauhaus-border bg-background text-xs font-extrabold uppercase rounded-lg"
+            className="p-1 hover:bg-muted rounded-md transition-colors"
+            aria-label="Close"
           >
-            Close
+            <X size={14} />
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-5">
-        {/* Left: Presets + custom rows */}
-        <div className="flex-1 min-w-0">
-          {/* Preset palettes */}
-          <div className="mb-4">
-            <div className="text-[10px] font-extrabold uppercase mb-2 text-muted-foreground">
-              Preset palettes
-            </div>
-            <div className="flex flex-wrap gap-2">
+      {/* Body — compact horizontal layout */}
+      <div className="flex flex-col sm:flex-row gap-0 max-h-[340px]">
+        {/* Left: Element selectors + presets */}
+        <div className="flex-1 p-3 space-y-3 overflow-y-auto border-r-0 sm:border-r-[2px] border-ink">
+          {/* Element colour rows */}
+          <div className="space-y-1.5">
+            {ELEMENTS.map(({ key, label, icon }) => {
+              const isActive = activeKey === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveKey(key)}
+                  className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-xl border-[2px] transition-all ${
+                    isActive
+                      ? "border-ink bg-muted shadow-[2px_2px_0_0_hsl(var(--ink))]"
+                      : "border-transparent hover:border-ink/30 hover:bg-muted/30"
+                  }`}
+                >
+                  <span className="text-sm w-5 text-center">{icon}</span>
+                  <span className="text-[11px] font-extrabold uppercase flex-1 text-left">{label}</span>
+                  <HexInput
+                    value={colors[key]}
+                    onChange={(v) => setColors((c) => ({ ...c, [key]: v }))}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Preset palettes — horizontal scroll */}
+          <div>
+            <div className="text-[9px] font-extrabold uppercase mb-1.5 text-muted-foreground tracking-wider">Presets</div>
+            <div className="flex gap-1.5 flex-wrap">
               {PALETTE_PRESETS.map((p) => (
                 <button
                   key={p.name}
                   onClick={() => applyPreset(p.colors)}
-                  className="bauhaus-border hover-lift overflow-hidden rounded-lg"
+                  className="border-[2px] border-ink hover:shadow-[2px_2px_0_0_hsl(var(--ink))] transition-shadow overflow-hidden rounded-lg"
                   title={p.name}
-                  aria-label={`Apply ${p.name} palette`}
                 >
                   <div className="flex">
-                    {p.colors.slice(0, 4).map((c, i) => (
-                      <div key={i} style={{ background: c, width: 20, height: 28 }} />
+                    {p.colors.slice(0, 5).map((c, i) => (
+                      <div key={i} style={{ background: c, width: 14, height: 22 }} />
                     ))}
                   </div>
                 </button>
               ))}
             </div>
           </div>
-
-          {/* Custom colour rows */}
-          <div>
-            <div className="text-[10px] font-extrabold uppercase mb-2 text-muted-foreground">
-              Custom colours
-            </div>
-            <div className="grid sm:grid-cols-2 gap-2">
-              {ELEMENT_LABELS.map(({ key, label }) => (
-                <div key={key} onClick={() => setActiveKey(key)}>
-                  <ColourRow
-                    label={label}
-                    value={colors[key]}
-                    onChange={(v) => setColors((c) => ({ ...c, [key]: v }))}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Right: Colour wheel */}
-        <div className="flex-shrink-0 flex flex-col items-center gap-2">
-          <div className="text-[10px] font-extrabold uppercase mb-1 text-muted-foreground">
-            Colour wheel — {ELEMENT_LABELS.find((e) => e.key === activeKey)?.label}
+        {/* Right: Wheel + lightness */}
+        <div className="flex flex-col items-center gap-2 p-3 bg-muted/20">
+          <div className="text-[9px] font-extrabold uppercase text-muted-foreground tracking-wider">
+            {ELEMENTS.find((e) => e.key === activeKey)?.label}
           </div>
-          <ColourWheel
+          <HueSatWheel
+            value={colors[activeKey]}
+            onChange={(v) => setColors((c) => ({ ...c, [activeKey]: v }))}
+          />
+          <LightnessSlider
             value={colors[activeKey]}
             onChange={(v) => setColors((c) => ({ ...c, [activeKey]: v }))}
           />
         </div>
       </div>
-
-      <p className="text-[10px] text-muted-foreground mt-3">
-        Click a swatch or use the colour wheel. Type hex values directly. Background recolours instantly.
-      </p>
     </div>
   );
 };
