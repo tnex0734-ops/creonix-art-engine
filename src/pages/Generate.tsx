@@ -180,6 +180,7 @@ const Generate = () => {
                     <img
                       src={imageUrl}
                       alt="Generated illustration"
+                      crossOrigin="anonymous"
                       className="max-w-full max-h-full block"
                       style={{
                         transform: `scale(${zoom})`,
