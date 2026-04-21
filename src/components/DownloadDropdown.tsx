@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, ChevronDown, FileImage, FileType, ImageIcon } from "lucide-react";
+import { Download, ChevronDown, FileImage, FileType, ImageIcon, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
 
 type Props = {
-  imageUrl: string;
+  /** Provide exportCanvas to get a colorized canvas for download */
+  exportCanvas?: (bgWhite?: boolean) => HTMLCanvasElement | null;
+  /** Legacy: raw image URL (used in Gallery where no colour customisation exists) */
+  imageUrl?: string;
   filenameBase?: string;
   variant?: "primary" | "icon";
   className?: string;
@@ -43,16 +47,14 @@ const loadImageToCanvas = (
     img.src = src;
   });
 
-/** Proxy through edge function if direct fetch is tainted by CORS */
 const getProxiedUrl = (originalUrl: string): string => {
   const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-  // Supabase storage URLs from same project don't need proxy
   if (originalUrl.includes(`${projectId}.supabase.co`)) return originalUrl;
-  // External URLs: proxy through edge function
   return `https://${projectId}.supabase.co/functions/v1/proxy-image?url=${encodeURIComponent(originalUrl)}`;
 };
 
 export const DownloadDropdown = ({
+  exportCanvas,
   imageUrl,
   filenameBase = "creonix",
   variant = "primary",
@@ -77,40 +79,55 @@ export const DownloadDropdown = ({
     };
   }, []);
 
-  const downloadAs = async (format: "png" | "jpeg" | "svg") => {
+  const getCanvas = async (bgWhite: boolean): Promise<HTMLCanvasElement | null> => {
+    // Prefer exportCanvas (colorized) over raw imageUrl
+    if (exportCanvas) {
+      return exportCanvas(bgWhite);
+    }
+    if (imageUrl) {
+      const src = getProxiedUrl(imageUrl);
+      return loadImageToCanvas(src, bgWhite);
+    }
+    return null;
+  };
+
+  const downloadAs = async (format: "png" | "jpeg" | "svg" | "pdf") => {
     setOpen(false);
-    const src = getProxiedUrl(imageUrl);
     try {
       if (format === "svg") {
-        // Fetch image and wrap in SVG
-        const res = await fetch(src);
-        if (!res.ok) throw new Error("Fetch failed");
-        const blob = await res.blob();
-        const dataUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(blob);
-        });
+        const canvas = await getCanvas(false);
+        if (!canvas) throw new Error("No image");
+        const dataUrl = canvas.toDataURL("image/png");
         const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <image href="${dataUrl}" width="1024" height="1024"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${canvas.width} ${canvas.height}" width="${canvas.width}" height="${canvas.height}">
+  <image href="${dataUrl}" width="${canvas.width}" height="${canvas.height}"/>
 </svg>`;
-        const svgBlob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-        triggerDownload(URL.createObjectURL(svgBlob), `${filenameBase}.svg`);
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        triggerDownload(URL.createObjectURL(blob), `${filenameBase}.svg`);
+      } else if (format === "pdf") {
+        const canvas = await getCanvas(true);
+        if (!canvas) throw new Error("No image");
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
+        const isLandscape = canvas.width > canvas.height;
+        const pdf = new jsPDF({
+          orientation: isLandscape ? "landscape" : "portrait",
+          unit: "px",
+          format: [canvas.width, canvas.height],
+        });
+        pdf.addImage(imgData, "JPEG", 0, 0, canvas.width, canvas.height);
+        pdf.save(`${filenameBase}.pdf`);
       } else if (format === "png") {
-        const canvas = await loadImageToCanvas(src, false);
+        const canvas = await getCanvas(false);
+        if (!canvas) throw new Error("No image");
         canvas.toBlob(
-          (b) => {
-            if (b) triggerDownload(URL.createObjectURL(b), `${filenameBase}.png`);
-          },
+          (b) => { if (b) triggerDownload(URL.createObjectURL(b), `${filenameBase}.png`); },
           "image/png"
         );
       } else {
-        const canvas = await loadImageToCanvas(src, true);
+        const canvas = await getCanvas(true);
+        if (!canvas) throw new Error("No image");
         canvas.toBlob(
-          (b) => {
-            if (b) triggerDownload(URL.createObjectURL(b), `${filenameBase}.jpg`);
-          },
+          (b) => { if (b) triggerDownload(URL.createObjectURL(b), `${filenameBase}.jpg`); },
           "image/jpeg",
           0.92
         );
@@ -163,9 +180,15 @@ export const DownloadDropdown = ({
           </button>
           <button
             onClick={() => downloadAs("png")}
-            className="w-full px-4 py-3 text-left text-xs font-extrabold uppercase hover:bg-accent inline-flex items-center gap-2"
+            className="w-full px-4 py-3 text-left text-xs font-extrabold uppercase hover:bg-accent border-b-[2px] border-ink inline-flex items-center gap-2"
           >
             <ImageIcon size={14} /> Download PNG
+          </button>
+          <button
+            onClick={() => downloadAs("pdf")}
+            className="w-full px-4 py-3 text-left text-xs font-extrabold uppercase hover:bg-accent inline-flex items-center gap-2"
+          >
+            <FileText size={14} /> Download PDF
           </button>
         </div>
       )}
