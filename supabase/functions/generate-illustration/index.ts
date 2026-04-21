@@ -67,7 +67,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
+        model: "google/gemini-3.1-flash-image-preview",
         messages: [{ role: "user", content: fullPrompt }],
         modalities: ["image", "text"],
       }),
@@ -92,8 +92,14 @@ serve(async (req) => {
     }
 
     const aiData = await aiRes.json();
+    console.log("AI response keys:", JSON.stringify(Object.keys(aiData)));
+    console.log("AI choices[0].message keys:", JSON.stringify(aiData.choices?.[0]?.message ? Object.keys(aiData.choices[0].message) : "no message"));
+    
     const dataUrl: string | undefined = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!dataUrl) throw new Error("No image returned from AI");
+    if (!dataUrl) {
+      console.error("No image in AI response. Full response:", JSON.stringify(aiData).slice(0, 500));
+      throw new Error("No image returned from AI");
+    }
 
     // dataUrl looks like: data:image/png;base64,XXXX
     const match = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
