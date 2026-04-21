@@ -7,25 +7,13 @@ import { StylePreview } from "@/components/StylePreview";
 import { DownloadDropdown } from "@/components/DownloadDropdown";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Send, RefreshCw, Bookmark, Palette, ZoomIn, ZoomOut, Shuffle, RotateCcw,
+  Send, RefreshCw, Bookmark, Palette, ZoomIn, ZoomOut, Shuffle,
 } from "lucide-react";
+import { ColourCustomiser, DEFAULT_COLORS, type ElementColors } from "@/components/ColourCustomiser";
 import { toast } from "sonner";
 
 type Msg = { role: "user"; content: string; style: string };
 
-type ElementColors = {
-  background: string;
-  primary: string;
-  accent: string;
-  outline: string;
-};
-
-const DEFAULT_COLORS: ElementColors = {
-  background: "#FAF7F0",
-  primary: "#E63030",
-  accent: "#F5C400",
-  outline: "#111111",
-};
 
 const Generate = () => {
   const [params] = useSearchParams();
@@ -312,113 +300,6 @@ const Generate = () => {
         selected={style.name}
         onSelect={setStyle}
       />
-    </div>
-  );
-};
-
-const ELEMENT_LABELS: Array<{ key: keyof ElementColors; label: string }> = [
-  { key: "background", label: "Background" },
-  { key: "primary", label: "Primary Shape" },
-  { key: "accent", label: "Accent" },
-  { key: "outline", label: "Outline" },
-];
-
-const ColourCustomiser = ({
-  colors,
-  setColors,
-  onClose,
-  onReset,
-}: {
-  colors: ElementColors;
-  setColors: React.Dispatch<React.SetStateAction<ElementColors>>;
-  onClose: () => void;
-  onReset: () => void;
-}) => {
-  const applyPreset = (p: string[]) => {
-    setColors({
-      background: p[4] ?? colors.background,
-      primary: p[0] ?? colors.primary,
-      accent: p[2] ?? colors.accent,
-      outline: p[3] ?? colors.outline,
-    });
-  };
-
-  return (
-    <div className="bg-card border-t-[3px] border-ink p-5 max-h-[60%] overflow-y-auto rounded-t-2xl">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="heading-display text-lg">Customise colours</h4>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onReset}
-            className="text-xs font-extrabold uppercase inline-flex items-center gap-1 hover:text-primary"
-          >
-            <RotateCcw size={12} /> Reset
-          </button>
-          <button
-            onClick={onClose}
-            className="px-2 py-1 bauhaus-border bg-background text-xs font-extrabold uppercase rounded-lg"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-
-      {/* Preset palettes */}
-      <div className="mb-5">
-        <div className="text-[10px] font-extrabold uppercase mb-2 text-muted-foreground">
-          Preset palettes
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {PALETTE_PRESETS.map((p) => (
-            <button
-              key={p.name}
-              onClick={() => applyPreset(p.colors)}
-              className="bauhaus-border hover-lift overflow-hidden rounded-lg"
-              title={p.name}
-              aria-label={`Apply ${p.name} palette`}
-            >
-              <div className="flex">
-                {p.colors.slice(0, 4).map((c, i) => (
-                  <div key={i} style={{ background: c, width: 20, height: 28 }} />
-                ))}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Custom colours per element */}
-      <div>
-        <div className="text-[10px] font-extrabold uppercase mb-2 text-muted-foreground">
-          Custom colours
-        </div>
-        <div className="grid sm:grid-cols-2 gap-2">
-          {ELEMENT_LABELS.map(({ key, label }) => (
-            <label
-              key={key}
-              className="flex items-center justify-between gap-3 p-2 bauhaus-border bg-background rounded-xl cursor-pointer"
-            >
-              <span className="text-xs font-extrabold uppercase">{label}</span>
-              <span className="flex items-center gap-2">
-                <span
-                  className="h-7 w-7 border-[2px] border-ink rounded-md"
-                  style={{ background: colors[key] }}
-                />
-                <input
-                  type="color"
-                  value={colors[key]}
-                  onChange={(e) => setColors((c) => ({ ...c, [key]: e.target.value }))}
-                  className="sr-only"
-                  aria-label={`Pick ${label} colour`}
-                />
-              </span>
-            </label>
-          ))}
-        </div>
-        <p className="text-[10px] text-muted-foreground mt-3">
-          Background recolours instantly. For per-shape edits of vector outputs, save as SVG and edit in your design tool.
-        </p>
-      </div>
     </div>
   );
 };
