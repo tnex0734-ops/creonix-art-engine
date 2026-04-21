@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
-import { STYLES, PALETTE_PRESETS, type Style } from "@/lib/styles";
+import { STYLES, type Style } from "@/lib/styles";
 import { StylePickerModal } from "@/components/StylePickerModal";
 import { StylePreview } from "@/components/StylePreview";
 import { DownloadDropdown } from "@/components/DownloadDropdown";
@@ -10,10 +10,10 @@ import {
   Send, RefreshCw, Bookmark, Palette, ZoomIn, ZoomOut, Shuffle,
 } from "lucide-react";
 import { ColourCustomiser, DEFAULT_COLORS, type ElementColors } from "@/components/ColourCustomiser";
+import { useColorizedCanvas } from "@/hooks/useColorizedCanvas";
 import { toast } from "sonner";
 
 type Msg = { role: "user"; content: string; style: string };
-
 
 const Generate = () => {
   const [params] = useSearchParams();
@@ -32,6 +32,7 @@ const Generate = () => {
   const [colors, setColors] = useState<ElementColors>(DEFAULT_COLORS);
 
   const historyRef = useRef<HTMLDivElement>(null);
+  const { canvasRef, containerRef, exportCanvas } = useColorizedCanvas(imageUrl, colors, zoom);
 
   useEffect(() => {
     historyRef.current?.scrollTo({ top: historyRef.current.scrollHeight, behavior: "smooth" });
@@ -77,27 +78,14 @@ const Generate = () => {
     toast.success("Already saved to your gallery!");
   };
 
-  // Visual recolouring via blended overlays (raster output → element-style tinting)
-  const overlayStyle = useMemo<React.CSSProperties>(() => {
-    return {
-      background: colors.background,
-    };
-  }, [colors.background]);
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      {/* Two-panel workspace: LEFT = output 60%, RIGHT = prompt 40% */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[60fr_40fr] border-t-[3px] border-ink min-h-0">
-        {/* LEFT — OUTPUT (60%) */}
-        <main
-          className="relative flex flex-col bg-muted/30 border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-ink min-h-0"
-          style={{ height: "auto" }}
-        >
-          <div
-            className="flex-1 flex flex-col p-4 md:p-6 min-h-0 lg:h-[calc(100vh-4rem-3px)]"
-          >
+        {/* LEFT — OUTPUT */}
+        <main className="relative flex flex-col bg-muted/30 border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-ink min-h-0">
+          <div className="flex-1 flex flex-col p-4 md:p-6 min-h-0 lg:h-[calc(100vh-4rem-3px)]">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-2 mb-3 flex-shrink-0">
               <div className="flex bauhaus-border bg-background rounded-2xl overflow-hidden">
@@ -139,7 +127,7 @@ const Generate = () => {
                 </button>
                 {imageUrl && (
                   <DownloadDropdown
-                    imageUrl={imageUrl}
+                    exportCanvas={exportCanvas}
                     filenameBase={`creonix-${genId ?? "image"}`}
                     variant="primary"
                   />
@@ -147,12 +135,9 @@ const Generate = () => {
               </div>
             </div>
 
-            {/* Output frame — fills remaining height, no scroll */}
+            {/* Output frame — canvas-based preview */}
             <div className="flex-1 min-h-[50vh] lg:min-h-0 relative">
-              <div
-                className="absolute inset-0 bauhaus-border-thick bauhaus-shadow-lg overflow-hidden rounded-2xl"
-                style={overlayStyle}
-              >
+              <div className="absolute inset-0 bauhaus-border-thick bauhaus-shadow-lg overflow-hidden rounded-2xl bg-muted/20">
                 {loading && (
                   <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-gradient-to-r from-muted via-background to-muted bg-[length:200%_100%] animate-shimmer" />
@@ -164,19 +149,10 @@ const Generate = () => {
                 )}
 
                 {!loading && imageUrl && (
-                  <div className="w-full h-full flex items-center justify-center p-4">
-                    <img
-                      src={imageUrl}
-                      alt="Generated illustration"
-                      crossOrigin="anonymous"
-                      className="max-w-full max-h-full block"
-                      style={{
-                        transform: `scale(${zoom})`,
-                        transformOrigin: "center",
-                        transition: "transform 200ms ease",
-                        objectFit: "contain",
-                        filter: `drop-shadow(0 0 0 ${colors.outline})`,
-                      }}
+                  <div ref={containerRef} className="w-full h-full">
+                    <canvas
+                      ref={canvasRef}
+                      className="block w-full h-full"
                     />
                   </div>
                 )}
@@ -198,7 +174,6 @@ const Generate = () => {
                   </div>
                 )}
 
-                {/* Bottom action row: regenerate left, palette panel toggle */}
                 {imageUrl && !loading && (
                   <div className="absolute bottom-3 right-3 flex gap-2 z-10">
                     <button
@@ -212,7 +187,7 @@ const Generate = () => {
                 )}
               </div>
 
-              {/* Slide-up colour panel — anchored over output */}
+              {/* Slide-up colour panel */}
               <div
                 className={`absolute left-0 right-0 bottom-0 transition-transform duration-200 ease-out z-20 ${
                   showPalette && imageUrl ? "translate-y-0" : "translate-y-full"
@@ -230,9 +205,8 @@ const Generate = () => {
           </div>
         </main>
 
-        {/* RIGHT — PROMPT / CHAT (40%) */}
+        {/* RIGHT — PROMPT / CHAT */}
         <aside className="bg-card flex flex-col min-h-0 lg:h-[calc(100vh-4rem-3px)]">
-          {/* Selected style header */}
           <div className="p-5 border-b-[3px] border-ink flex items-center justify-between gap-3 flex-shrink-0">
             <div className="flex items-center gap-3 min-w-0">
               <div className="h-12 w-12 flex-shrink-0">
@@ -251,7 +225,6 @@ const Generate = () => {
             </button>
           </div>
 
-          {/* History */}
           <div ref={historyRef} className="flex-1 overflow-y-auto p-5 space-y-3 min-h-[160px]">
             {history.length === 0 ? (
               <div className="text-center text-muted-foreground py-12">
@@ -271,7 +244,6 @@ const Generate = () => {
             )}
           </div>
 
-          {/* Prompt input */}
           <div className="p-5 border-t-[3px] border-ink bg-background flex-shrink-0">
             <textarea
               value={prompt}
