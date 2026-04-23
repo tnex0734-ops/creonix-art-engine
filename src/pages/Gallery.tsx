@@ -103,7 +103,7 @@ const Gallery = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filtered.map((g) => (
-              <article key={g.id} className="bauhaus-border bg-card overflow-hidden hover-lift rounded-2xl">
+              <article key={g.id} className="bauhaus-border bg-card hover-lift rounded-2xl">
                 <div className="aspect-square bg-muted overflow-hidden rounded-t-[14px]">
                   <img src={g.image_url} alt={g.prompt} crossOrigin="anonymous" className="w-full h-full object-cover" loading="lazy" />
                 </div>
