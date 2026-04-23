@@ -160,13 +160,21 @@ const Generate = () => {
                 {!loading && !imageUrl && (
                   <div className="w-full h-full flex items-center justify-center p-8">
                     <div className="text-center">
-                      <div className="flex justify-center gap-3 mb-6">
-                        <div className="h-16 w-16 rounded-full bg-primary border-[3px] border-ink" />
-                        <div className="h-16 w-16 bg-secondary border-[3px] border-ink" />
-                        <div
-                          className="h-16 w-16 bg-accent border-[3px] border-ink"
-                          style={{ clipPath: "polygon(50% 0, 100% 100%, 0 100%)" }}
-                        />
+                      <div className="flex justify-center mb-6">
+                        <svg
+                          width="96"
+                          height="96"
+                          viewBox="0 0 80 80"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          {/* Letter C from the Creonix logo — blue Pac-Man circle with red dot */}
+                          <path
+                            d="M 72.76 17.06 A 40 40 0 1 0 72.76 62.94 L 40 40 Z"
+                            fill="hsl(var(--secondary))"
+                          />
+                          <circle cx="58" cy="40" r="7.2" fill="hsl(var(--primary))" />
+                        </svg>
                       </div>
                       <h3 className="heading-display text-2xl mb-2">Your canvas awaits</h3>
                       <p className="text-sm text-muted-foreground">Pick a style and write a prompt to begin.</p>
