@@ -12,39 +12,24 @@ export const Footer = () => (
         © {new Date().getFullYear()} Creonix. All rights reserved.
       </p>
 
-      <div className="flex items-center gap-3">
-        <span
-          className="text-ink-foreground uppercase"
-          style={{
-            fontFamily: "'Syne', sans-serif",
-            fontWeight: 800,
-            fontSize: "15px",
-            letterSpacing: "0.16em",
-          }}
-        >
-          Designed by taushik
+      <div className="flex items-center gap-4 flex-wrap justify-center">
+        <span className="heading-display text-ink-foreground text-3xl md:text-4xl">
+          Designed by <span className="text-primary">taushik</span>
         </span>
         <a
           href="https://www.linkedin.com/in/taushik-chandana-16ba14378?utm_source=share_via&utm_content=profile&utm_medium=member_android"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Taushik on LinkedIn"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink-foreground hover:text-[#0A66C2] transition-colors duration-200"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-background text-ink hover:bg-[#0A66C2] hover:text-ink-foreground bauhaus-border hover-lift transition-colors"
         >
-          <Linkedin size={20} strokeWidth={2.25} />
+          <Linkedin size={22} strokeWidth={2.5} />
         </a>
       </div>
 
-      <p
-        className="text-ink-foreground/50"
-        style={{
-          fontFamily: "'Syne', sans-serif",
-          fontWeight: 400,
-          fontSize: "12px",
-          letterSpacing: "0.1em",
-        }}
-      >
-        Built by a designer. For designers. <span className="text-primary">♥</span>
+      <p className="heading-display text-ink-foreground/80 text-base md:text-lg tracking-wider">
+        Built by a designer. For designers.{" "}
+        <span className="text-primary">♥</span>
       </p>
     </div>
   </footer>
