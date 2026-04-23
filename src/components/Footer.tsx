@@ -4,8 +4,8 @@ import { Logo } from "./Logo";
 export const Footer = () => (
   <footer className="border-t-[3px] border-ink bg-ink text-ink-foreground mt-24">
     <div className="container py-14 flex flex-col items-center gap-6 text-center">
-      <div className="bg-background inline-block px-4 py-2.5 bauhaus-border rounded-2xl">
-        <Logo size="md" />
+      <div className="bg-background inline-block px-5 py-3 bauhaus-border rounded-2xl">
+        <Logo size="lg" />
       </div>
 
       <p className="text-xs text-ink-foreground/60 tracking-wider">
