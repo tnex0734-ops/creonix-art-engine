@@ -7,7 +7,7 @@ import { StylePreview } from "@/components/StylePreview";
 import { DownloadDropdown } from "@/components/DownloadDropdown";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Send, RefreshCw, Bookmark, Palette, ZoomIn, ZoomOut, Shuffle,
+  Send, RefreshCw, Bookmark, ZoomIn, ZoomOut, Shuffle, ChevronDown,
 } from "lucide-react";
 import { ColourCustomiser, DEFAULT_COLORS, type ElementColors } from "@/components/ColourCustomiser";
 import { useColorizedCanvas } from "@/hooks/useColorizedCanvas";
