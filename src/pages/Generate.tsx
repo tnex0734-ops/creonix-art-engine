@@ -73,11 +73,6 @@ const Generate = () => {
     setTimeout(generate, 0);
   };
 
-  const saveToGallery = () => {
-    if (!genId) return toast.error("Nothing to save yet");
-    toast.success("Already saved to your gallery!");
-  };
-
   const [saved, setSaved] = useState(false);
   useEffect(() => { setSaved(false); }, [genId]);
 
