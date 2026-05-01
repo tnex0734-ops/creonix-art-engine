@@ -7,7 +7,7 @@ import { StylePreview } from "@/components/StylePreview";
 import { DownloadDropdown } from "@/components/DownloadDropdown";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Send, RefreshCw, Bookmark, Palette, ZoomIn, ZoomOut, Shuffle,
+  Send, RefreshCw, Bookmark, ZoomIn, ZoomOut, Shuffle, ChevronDown,
 } from "lucide-react";
 import { ColourCustomiser, DEFAULT_COLORS, type ElementColors } from "@/components/ColourCustomiser";
 import { useColorizedCanvas } from "@/hooks/useColorizedCanvas";
@@ -73,10 +73,8 @@ const Generate = () => {
     setTimeout(generate, 0);
   };
 
-  const saveToGallery = () => {
-    if (!genId) return toast.error("Nothing to save yet");
-    toast.success("Already saved to your gallery!");
-  };
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { setSaved(false); }, [genId]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -86,7 +84,7 @@ const Generate = () => {
         {/* LEFT — OUTPUT */}
         <main className="relative flex flex-col bg-muted/30 border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-ink min-h-0">
           <div className="flex-1 flex flex-col p-4 md:p-6 min-h-0 lg:h-[calc(100vh-4rem-3px)]">
-            {/* Toolbar */}
+            {/* Toolbar (zoom only — Save moved to image, Customise moved below) */}
             <div className="flex flex-wrap items-center gap-2 mb-3 flex-shrink-0">
               <div className="flex bauhaus-border bg-background rounded-2xl overflow-hidden">
                 <button
@@ -107,37 +105,11 @@ const Generate = () => {
                   <ZoomIn size={16} />
                 </button>
               </div>
-
-              <div className="ml-auto flex flex-wrap gap-2">
-                <button
-                  onClick={() => setShowPalette((s) => !s)}
-                  disabled={!imageUrl}
-                  className={`px-4 py-2.5 bauhaus-border hover-lift text-xs font-extrabold uppercase inline-flex items-center gap-2 disabled:opacity-50 rounded-2xl ${
-                    showPalette ? "bg-accent" : "bg-background"
-                  }`}
-                >
-                  <Palette size={14} /> Customise Colours
-                </button>
-                <button
-                  onClick={saveToGallery}
-                  disabled={!imageUrl}
-                  className="px-4 py-2.5 bg-background bauhaus-border hover-lift text-xs font-extrabold uppercase inline-flex items-center gap-2 disabled:opacity-50 rounded-2xl"
-                >
-                  <Bookmark size={14} /> Save
-                </button>
-                {imageUrl && (
-                  <DownloadDropdown
-                    exportCanvas={exportCanvas}
-                    filenameBase={`creonix-${genId ?? "image"}`}
-                    variant="primary"
-                  />
-                )}
-              </div>
             </div>
 
-            {/* Output frame — canvas-based preview */}
-            <div className="flex-1 min-h-[50vh] lg:min-h-0 relative">
-              <div className="absolute inset-0 bauhaus-border-thick bauhaus-shadow-lg overflow-hidden rounded-2xl bg-muted/20">
+            {/* Output frame */}
+            <div className="flex-1 min-h-[50vh] lg:min-h-0 relative flex flex-col">
+              <div className="flex-1 relative bauhaus-border-thick bauhaus-shadow-lg overflow-hidden rounded-2xl bg-muted/20">
                 {loading && (
                   <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-gradient-to-r from-muted via-background to-muted bg-[length:200%_100%] animate-shimmer" />
@@ -168,7 +140,6 @@ const Generate = () => {
                           xmlns="http://www.w3.org/2000/svg"
                           aria-hidden="true"
                         >
-                          {/* Letter C from the Creonix logo — blue Pac-Man circle with red dot */}
                           <path
                             d="M 72.76 17.06 A 40 40 0 1 0 72.76 62.94 L 40 40 Z"
                             fill="hsl(var(--secondary))"
@@ -182,8 +153,43 @@ const Generate = () => {
                   </div>
                 )}
 
+                {/* Save to Gallery — TOP RIGHT, absolute */}
                 {imageUrl && !loading && (
-                  <div className="absolute bottom-3 right-3 flex gap-2 z-10">
+                  <button
+                    onClick={() => {
+                      if (!genId) { toast.error("Nothing to save yet"); return; }
+                      setSaved(true);
+                      toast.success("Saved to your gallery!");
+                    }}
+                    className="group absolute top-3 right-3 z-10 inline-flex items-center justify-center transition-transform hover:scale-[1.08]"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      transitionDuration: "150ms",
+                    }}
+                    aria-label={saved ? "Saved!" : "Save to Gallery"}
+                  >
+                    <span
+                      className="inline-flex items-center justify-center"
+                      style={{
+                        width: 36,
+                        height: 36,
+                        background: saved ? "#111111" : "#F5C400",
+                        border: "2px solid #111111",
+                        borderRadius: 6,
+                        color: saved ? "#F5C400" : "#111111",
+                      }}
+                    >
+                      <Bookmark size={16} fill={saved ? "#F5C400" : "none"} />
+                    </span>
+                    <span className="pointer-events-none absolute top-full mt-1 right-0 whitespace-nowrap bg-ink text-ink-foreground text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                      {saved ? "Saved!" : "Save to Gallery"}
+                    </span>
+                  </button>
+                )}
+
+                {imageUrl && !loading && (
+                  <div className="absolute bottom-3 left-3 z-10">
                     <button
                       onClick={regenerate}
                       disabled={loading}
@@ -193,14 +199,59 @@ const Generate = () => {
                     </button>
                   </div>
                 )}
+
+                {imageUrl && !loading && (
+                  <div className="absolute bottom-3 right-3 z-10">
+                    <DownloadDropdown
+                      exportCanvas={exportCanvas}
+                      filenameBase={`creonix-${genId ?? "image"}`}
+                      variant="primary"
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Slide-up colour panel */}
+              {/* Customise Colours button — directly BELOW image, full width */}
+              <button
+                onClick={() => setShowPalette((s) => !s)}
+                disabled={!imageUrl}
+                className="mt-3 w-full inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                style={{
+                  height: 44,
+                  background: showPalette ? "#111111" : "#FFFFFF",
+                  color: showPalette ? "#FFFFFF" : "#111111",
+                  border: "2px solid #111111",
+                  borderRadius: 6,
+                  fontFamily: "'Syne', sans-serif",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+                onMouseEnter={(e) => {
+                  if (!showPalette && !e.currentTarget.disabled) e.currentTarget.style.background = "#F5F0E8";
+                }}
+                onMouseLeave={(e) => {
+                  if (!showPalette) e.currentTarget.style.background = "#FFFFFF";
+                }}
+              >
+                {/* swatch icon: 3 overlapping circles */}
+                <span className="relative inline-block" style={{ width: 28, height: 16 }}>
+                  <span className="absolute" style={{ left: 0, top: 0, width: 16, height: 16, borderRadius: "50%", background: "#E63030", border: "1.5px solid #111" }} />
+                  <span className="absolute" style={{ left: 6, top: 0, width: 16, height: 16, borderRadius: "50%", background: "#1A4BDB", border: "1.5px solid #111" }} />
+                  <span className="absolute" style={{ left: 12, top: 0, width: 16, height: 16, borderRadius: "50%", background: "#F5C400", border: "1.5px solid #111" }} />
+                </span>
+                Customise Colours <ChevronDown size={14} className={`transition-transform duration-200 ${showPalette ? "rotate-180" : ""}`} />
+              </button>
+
+              {/* Slide-down colour panel BELOW the button */}
               <div
-                className={`absolute left-0 right-0 bottom-0 transition-transform duration-200 ease-out z-20 ${
-                  showPalette && imageUrl ? "translate-y-0" : "translate-y-full"
-                }`}
-                style={{ pointerEvents: showPalette && imageUrl ? "auto" : "none" }}
+                className="overflow-hidden transition-[max-height,opacity,margin] duration-200 ease-out"
+                style={{
+                  maxHeight: showPalette && imageUrl ? 600 : 0,
+                  opacity: showPalette && imageUrl ? 1 : 0,
+                  marginTop: showPalette && imageUrl ? 12 : 0,
+                }}
               >
                 <ColourCustomiser
                   colors={colors}

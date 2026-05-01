@@ -3,33 +3,65 @@ import { Logo } from "./Logo";
 
 export const Footer = () => (
   <footer className="border-t-[3px] border-ink bg-ink text-ink-foreground mt-24">
-    <div className="container py-14 flex flex-col items-center gap-6 text-center">
-      <div className="bg-background inline-block px-5 py-3 bauhaus-border rounded-2xl">
-        <Logo size="lg" />
-      </div>
+    <div className="container py-14 flex flex-col items-center gap-8 text-center">
+      {/* Logo (CX monogram, white-friendly variant) */}
+      <Logo size="md" variant="mark" onDark />
 
       <p className="text-xs text-ink-foreground/60 tracking-wider">
         © {new Date().getFullYear()} Creonix. All rights reserved.
       </p>
 
-      <div className="flex items-center gap-4 flex-wrap justify-center">
-        <span className="heading-display text-ink-foreground text-3xl md:text-4xl">
-          Designed by <span className="text-primary">taushik</span>
-        </span>
-        <a
-          href="https://www.linkedin.com/in/taushik-chandana-16ba14378?utm_source=share_via&utm_content=profile&utm_medium=member_android"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Taushik on LinkedIn"
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-background text-ink hover:bg-[#0A66C2] hover:text-ink-foreground bauhaus-border hover-lift transition-colors"
+      {/* Designed and Developed by TAUSHIK — typographic credit */}
+      <div className="flex flex-col items-center md:items-start gap-0.5">
+        <span
+          className="block uppercase"
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 500,
+            fontSize: "11px",
+            letterSpacing: "0.18em",
+            color: "#888888",
+          }}
         >
-          <Linkedin size={22} strokeWidth={2.5} />
-        </a>
+          Designed and Developed by
+        </span>
+        <div className="flex items-center gap-3">
+          <span
+            className="block"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontWeight: 400,
+              fontSize: "26px",
+              letterSpacing: "0.2em",
+              color: "#FFFFFF",
+              lineHeight: 1,
+            }}
+          >
+            TAUSHIK
+          </span>
+          <a
+            href="https://www.linkedin.com/in/taushik-chandana-16ba14378/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Taushik Chandana on LinkedIn"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-white hover:text-[#0A66C2] transition-colors"
+            style={{ transitionDuration: "200ms" }}
+          >
+            <Linkedin size={22} strokeWidth={2.5} />
+          </a>
+        </div>
       </div>
 
-      <p className="heading-display text-ink-foreground/80 text-base md:text-lg tracking-wider">
-        Built by a designer. For designers.{" "}
-        <span className="text-primary">♥</span>
+      <p
+        style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 500,
+          fontSize: "11px",
+          letterSpacing: "0.1em",
+          color: "#555555",
+        }}
+      >
+        Built by a designer. For designers. <span className="text-primary">♥</span>
       </p>
     </div>
   </footer>
