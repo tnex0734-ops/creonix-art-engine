@@ -38,8 +38,8 @@ serve(async (req) => {
       });
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -60,48 +60,51 @@ serve(async (req) => {
     const styleHint = STYLE_PROMPTS[style] ?? style;
     const fullPrompt = `Create a professional illustration in ${style} style. ${prompt}. Style details: ${styleHint}. The illustration should be clean, vector-like, suitable for designers and graphic artists. High quality, detailed, with clear composition, no text, no watermark, centered.`;
 
-    // Call Google Gemini directly
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: fullPrompt }] }],
-          generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-        }),
-      }
-    );
+    // Lovable AI Gateway — Nano Banana 2 (fast, pro-quality image gen)
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3.1-flash-image-preview",
+        messages: [{ role: "user", content: fullPrompt }],
+        modalities: ["image", "text"],
+      }),
+    });
 
-    if (!geminiRes.ok) {
-      const t = await geminiRes.text();
-      console.error("Gemini error", geminiRes.status, t);
-      if (geminiRes.status === 429) {
+    if (!aiRes.ok) {
+      const t = await aiRes.text();
+      console.error("AI gateway error", aiRes.status, t);
+      if (aiRes.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit reached. Try again in a moment." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      return new Response(JSON.stringify({ error: "Gemini API error", details: t.slice(0, 500) }), {
+      if (aiRes.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exhausted. Add credits in Workspace Settings." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ error: "AI gateway error" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const data = await geminiRes.json();
-    const parts = data?.candidates?.[0]?.content?.parts ?? [];
-    const imagePart = parts.find((p: any) => p.inlineData || p.inline_data);
-    const inline = imagePart?.inlineData ?? imagePart?.inline_data;
-    if (!inline?.data) {
-      console.error("No image in Gemini response:", JSON.stringify(data).slice(0, 500));
-      return new Response(JSON.stringify({ error: "Generation failed", details: data }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const aiData = await aiRes.json();
+    const dataUrl: string | undefined = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    if (!dataUrl) {
+      console.error("No image in AI response:", JSON.stringify(aiData).slice(0, 500));
+      throw new Error("No image returned from AI");
     }
 
-    const mime = inline.mimeType ?? inline.mime_type ?? "image/png";
-    const b64 = inline.data;
-    const ext = (mime.split("/")[1] ?? "png").replace("+xml", "");
+    const match = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+    if (!match) throw new Error("Invalid image data");
+    const mime = match[1];
+    const ext = mime.split("/")[1].replace("+xml", "");
+    const b64 = match[2];
 
-    // Decode → upload to storage
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     const filename = `${userId}/${crypto.randomUUID()}.${ext}`;
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
