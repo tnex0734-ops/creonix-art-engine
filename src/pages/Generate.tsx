@@ -74,7 +74,27 @@ const Generate = () => {
   };
 
   const [saved, setSaved] = useState(false);
+  const [savingToggle, setSavingToggle] = useState(false);
   useEffect(() => { setSaved(false); }, [genId]);
+
+  const toggleSave = async () => {
+    if (!genId) { toast.error("Nothing to save yet"); return; }
+    if (savingToggle) return;
+    setSavingToggle(true);
+    const next = !saved;
+    setSaved(next); // optimistic
+    const { error } = await supabase
+      .from("generations")
+      .update({ is_saved: next })
+      .eq("id", genId);
+    if (error) {
+      setSaved(!next); // revert
+      toast.error("Couldn't update save state");
+    } else {
+      toast.success(next ? "Saved to your gallery!" : "Removed from saved");
+    }
+    setSavingToggle(false);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
