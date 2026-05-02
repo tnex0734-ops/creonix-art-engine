@@ -1,24 +1,22 @@
 type Variant = "mark" | "full";
 type Size = "sm" | "md" | "lg" | "xl";
 
-const HEIGHTS: Record<Size, number> = { sm: 26, md: 36, lg: 52, xl: 72 };
+const HEIGHTS: Record<Size, number> = { sm: 28, md: 40, lg: 56, xl: 80 };
 
 /**
- * CREONIX — Bauhaus geometric wordmark.
+ * CREONIX — Bauhaus geometric wordmark v2.
  *
- * Inspired by Snack Video / Google Bauhaus / Adidas geometric studies:
- * every letter is built from FLAT primitive shapes (circles, semicircles,
- * quarter-circles, rectangles, triangles) with NO outline strokes.
- * Shapes touch and overlap to form readable letterforms.
+ * A bolder, more confident take. Built on a strict 100-unit grid where every
+ * letter is composed from pure circles, rectangles, and triangles — no
+ * outlines. Inspired by Herbert Bayer's Universal alphabet and the Bauhaus
+ * Dessau signage, with a modern, sticker-flat finish.
  *
- * Palette (pulled from semantic tokens, never hard-coded hex):
- *   primary   = red
- *   secondary = blue
- *   accent    = yellow
- *   ink       = near-black (used sparingly for grounding)
- *
- * variant="mark" → CX monogram
- * variant="full" → full CREONIX wordmark
+ * Highlights:
+ *  • The "O" is a chunky red ring with a yellow dot — the brand "eye".
+ *  • The "C" mirrors the O as an open ring, in blue.
+ *  • The "X" is two solid bars, red + blue, crossing through a yellow square.
+ *  • Negative-space cuts replace painted bars where possible (true Bauhaus).
+ *  • Mark variant = the iconic O + X stacked into a compact monogram badge.
  */
 export const Logo = ({
   size = "md",
@@ -27,26 +25,22 @@ export const Logo = ({
 }: {
   size?: Size;
   variant?: Variant;
-  /** When true, use ink-foreground for shapes that would otherwise be ink */
   onDark?: boolean;
 }) => {
   const h = HEIGHTS[size];
 
-  // Color tokens
   const RED = "hsl(var(--primary))";
   const BLUE = "hsl(var(--secondary))";
   const YEL = "hsl(var(--accent))";
   const INK = onDark ? "hsl(var(--ink-foreground))" : "hsl(var(--ink))";
+  const BG = onDark ? "hsl(var(--ink))" : "hsl(var(--background))";
 
-  // Each letter occupies an 80-unit-wide cell on a 100-unit-tall canvas.
-  // Cap height = 80 (y: 10 → 90), baseline = 90.
-  const TOP = 10;
-  const BOT = 90;
-  const CAP = BOT - TOP; // 80
+  const TOP = 8;
+  const BOT = 92;
 
   if (variant === "mark") {
-    // CX monogram
-    const W = 200;
+    // Compact badge: O (red ring + yellow dot) overlapped by X cross.
+    const W = 100;
     const w = (h * W) / 100;
     return (
       <svg
@@ -57,20 +51,33 @@ export const Logo = ({
         aria-label="Creonix"
         role="img"
       >
-        <Letter_C x={10} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-        <Letter_X x={110} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
+        {/* Yellow square anchor */}
+        <rect x={18} y={18} width={64} height={64} fill={YEL} />
+        {/* Red ring (O) */}
+        <circle cx={50} cy={50} r={34} fill={RED} />
+        <circle cx={50} cy={50} r={16} fill={BG} />
+        {/* Blue diagonal bar (X stroke 1) */}
+        <rect
+          x={44}
+          y={6}
+          width={12}
+          height={88}
+          fill={BLUE}
+          transform="rotate(45 50 50)"
+        />
+        {/* Ink dot — the "eye" */}
+        <circle cx={50} cy={50} r={6} fill={INK} />
       </svg>
     );
   }
 
-  // Full wordmark — 7 letters, 80 wide each + 10 gap, plus 10 padding either side
-  // total = 10 + 7*80 + 6*10 + 10 = 640
-  const W = 640;
+  // Full wordmark — 7 letters laid out on a strict grid.
+  // Cell width 70, gap 14, side padding 10. Total = 10 + 7*70 + 6*14 + 10 = 594.
+  const cell = 70;
+  const gap = 14;
+  const W = 10 + 7 * cell + 6 * gap + 10;
   const w = (h * W) / 100;
-  const gap = 10;
-  const cell = 80;
   const xs = [0, 1, 2, 3, 4, 5, 6].map((i) => 10 + i * (cell + gap));
-  void CAP;
 
   return (
     <svg
@@ -81,20 +88,16 @@ export const Logo = ({
       aria-label="Creonix"
       role="img"
     >
-      <Letter_C x={xs[0]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-      <Letter_R x={xs[1]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-      <Letter_E x={xs[2]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-      <Letter_O x={xs[3]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-      <Letter_N x={xs[4]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-      <Letter_I x={xs[5]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
-      <Letter_X x={xs[6]} red={RED} blue={BLUE} yel={YEL} ink={INK} top={TOP} bot={BOT} />
+      <Letter_C x={xs[0]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      <Letter_R x={xs[1]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      <Letter_E x={xs[2]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      <Letter_O x={xs[3]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      <Letter_N x={xs[4]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      <Letter_I x={xs[5]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      <Letter_X x={xs[6]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
     </svg>
   );
 };
-
-// ─── Letter primitives ───────────────────────────────────────────────────
-// Each receives (x, top, bot) — bounding box top/bottom (y), x = left edge.
-// All draw inside an 80×80 cell. No strokes — pure flat shapes.
 
 type LP = {
   x: number;
@@ -104,113 +107,103 @@ type LP = {
   blue: string;
   yel: string;
   ink: string;
+  bg: string;
 };
 
-// C — Pac-man circle, blue, with a red dot inside the mouth
-const Letter_C = ({ x, top, bot, red, blue }: LP) => {
-  const cx = x + 40;
+// C — Open blue ring, mouth right. Bold, geometric.
+const Letter_C = ({ x, top, bot, blue, bg, yel }: LP) => {
+  const cx = x + 35;
   const cy = (top + bot) / 2;
   const r = (bot - top) / 2;
-  // Pie slice opening to the right (between -35° and +35°)
-  const a1 = (-35 * Math.PI) / 180;
-  const a2 = (35 * Math.PI) / 180;
-  const p1x = cx + r * Math.cos(a1);
-  const p1y = cy + r * Math.sin(a1);
-  const p2x = cx + r * Math.cos(a2);
-  const p2y = cy + r * Math.sin(a2);
-  // Use a single arc that goes the long way around (large-arc = 1)
-  const d = `M ${p1x} ${p1y} A ${r} ${r} 0 1 0 ${p2x} ${p2y} L ${cx} ${cy} Z`;
+  const inner = r - 13;
   return (
     <g>
-      <path d={d} fill={blue} />
-      <circle cx={cx + r * 0.45} cy={cy} r={r * 0.18} fill={red} />
+      <circle cx={cx} cy={cy} r={r} fill={blue} />
+      <circle cx={cx} cy={cy} r={inner} fill={bg} />
+      {/* mouth cut */}
+      <rect x={cx} y={cy - 11} width={r + 2} height={22} fill={bg} />
+      {/* yellow accent tab */}
+      <rect x={cx + r - 8} y={cy - 11} width={8} height={6} fill={yel} />
+      <rect x={cx + r - 8} y={cy + 5} width={8} height={6} fill={yel} />
     </g>
   );
 };
 
-// R — red rectangle stem + blue half-circle bowl + yellow triangular leg
+// R — Solid red stem, blue half-disc bowl, yellow leg triangle.
 const Letter_R = ({ x, top, bot, red, blue, yel }: LP) => {
   const h = bot - top;
-  const stemW = h * 0.28;
-  const bowlH = h * 0.55;
+  const stemW = 18;
+  const bowlH = h * 0.52;
   return (
     <g>
-      {/* stem */}
       <rect x={x} y={top} width={stemW} height={h} fill={red} />
-      {/* bowl: half circle (right semicircle) */}
+      {/* bowl */}
       <path
         d={`M ${x + stemW} ${top} A ${bowlH / 2} ${bowlH / 2} 0 0 1 ${x + stemW} ${top + bowlH} Z`}
         fill={blue}
       />
-      {/* leg: triangle from bowl bottom to bottom-right */}
+      {/* leg */}
       <polygon
-        points={`${x + stemW},${top + bowlH} ${x + stemW + bowlH * 0.55},${top + bowlH} ${x + h * 0.85},${bot} ${x + stemW * 1.5},${bot}`}
+        points={`${x + stemW},${top + bowlH - 4} ${x + stemW + 22},${top + bowlH - 4} ${x + 60},${bot} ${x + stemW + 4},${bot}`}
         fill={yel}
       />
     </g>
   );
 };
 
-// E — yellow block with two negative bars cut out (bars are background colour holes)
-// To work on any bg, we draw the E as 4 yellow rects (top bar, bottom bar, middle bar, left stem)
+// E — Three yellow horizontal bars + red stem. Crisp, blocky.
 const Letter_E = ({ x, top, bot, yel, red }: LP) => {
   const h = bot - top;
-  const w = h * 0.78;
-  const stemW = h * 0.26;
-  const barH = h * 0.18;
+  const w = 60;
+  const stemW = 18;
+  const barH = 16;
   return (
     <g>
-      {/* left stem */}
-      <rect x={x} y={top} width={stemW} height={h} fill={yel} />
-      {/* top bar */}
+      <rect x={x} y={top} width={stemW} height={h} fill={red} />
       <rect x={x} y={top} width={w} height={barH} fill={yel} />
-      {/* middle bar — a bit shorter, accent red for personality */}
-      <rect x={x} y={top + (h - barH) / 2} width={w * 0.78} height={barH} fill={red} />
-      {/* bottom bar */}
+      <rect x={x} y={top + (h - barH) / 2} width={w * 0.78} height={barH} fill={yel} />
       <rect x={x} y={bot - barH} width={w} height={barH} fill={yel} />
     </g>
   );
 };
 
-// O — full red circle with a blue dot inside (Adidas/Snack-style)
-const Letter_O = ({ x, top, bot, red, blue }: LP) => {
-  const cx = x + 40;
+// O — The hero. Red ring + yellow dot. The "Creonix eye."
+const Letter_O = ({ x, top, bot, red, yel, bg }: LP) => {
+  const cx = x + 35;
   const cy = (top + bot) / 2;
   const r = (bot - top) / 2;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill={red} />
-      <circle cx={cx} cy={cy} r={r * 0.32} fill={blue} />
+      <circle cx={cx} cy={cy} r={r - 14} fill={bg} />
+      <circle cx={cx} cy={cy} r={r - 26} fill={yel} />
     </g>
   );
 };
 
-// N — two blue posts joined by a yellow diagonal parallelogram
+// N — Two blue posts joined by a yellow diagonal slab.
 const Letter_N = ({ x, top, bot, blue, yel }: LP) => {
   const h = bot - top;
-  const stemW = h * 0.26;
-  const rightX = x + h * 0.85 - stemW;
+  const stemW = 18;
+  const rightX = x + 70 - stemW;
   return (
     <g>
-      {/* left post */}
       <rect x={x} y={top} width={stemW} height={h} fill={blue} />
-      {/* right post */}
       <rect x={rightX} y={top} width={stemW} height={h} fill={blue} />
-      {/* diagonal connector — parallelogram from top-left-stem-right to bottom-right-stem-left */}
       <polygon
-        points={`${x + stemW},${top} ${x + stemW * 1.9},${top} ${rightX + stemW},${bot} ${rightX + stemW * 0.1},${bot}`}
+        points={`${x + stemW},${top} ${x + stemW + 14},${top} ${rightX + stemW},${bot} ${rightX - 14 + stemW},${bot}`}
         fill={yel}
       />
     </g>
   );
 };
 
-// I — slim yellow stem with red square caps
+// I — Yellow stem with red square caps. Mini totem.
 const Letter_I = ({ x, top, bot, yel, red }: LP) => {
   const h = bot - top;
-  const w = h * 0.5;
-  const stemW = h * 0.22;
-  const capH = h * 0.18;
+  const w = 40;
+  const stemW = 18;
+  const capH = 16;
   const stemX = x + (w - stemW) / 2;
   return (
     <g>
@@ -221,13 +214,13 @@ const Letter_I = ({ x, top, bot, yel, red }: LP) => {
   );
 };
 
-// X — two crossing bars, red over yellow
-const Letter_X = ({ x, top, bot, red, yel }: LP) => {
+// X — Two crossing bars, red over blue, with a yellow square at the heart.
+const Letter_X = ({ x, top, bot, red, blue, yel }: LP) => {
   const h = bot - top;
-  const cx = x + 40;
+  const cx = x + 35;
   const cy = (top + bot) / 2;
-  const barW = h * 0.26;
-  const barH = h * 1.08;
+  const barW = 18;
+  const barH = h * 1.12;
   return (
     <g>
       <rect
@@ -235,7 +228,7 @@ const Letter_X = ({ x, top, bot, red, yel }: LP) => {
         y={cy - barH / 2}
         width={barW}
         height={barH}
-        fill={yel}
+        fill={blue}
         transform={`rotate(-45 ${cx} ${cy})`}
       />
       <rect
@@ -246,6 +239,7 @@ const Letter_X = ({ x, top, bot, red, yel }: LP) => {
         fill={red}
         transform={`rotate(45 ${cx} ${cy})`}
       />
+      <rect x={cx - 6} y={cy - 6} width={12} height={12} fill={yel} />
     </g>
   );
 };
