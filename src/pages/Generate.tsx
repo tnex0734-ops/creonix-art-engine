@@ -74,7 +74,39 @@ const Generate = () => {
   };
 
   const [saved, setSaved] = useState(false);
-  useEffect(() => { setSaved(false); }, [genId]);
+  const [savingToggle, setSavingToggle] = useState(false);
+  useEffect(() => {
+    if (!genId) { setSaved(false); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("generations")
+        .select("is_saved")
+        .eq("id", genId)
+        .maybeSingle();
+      if (!cancelled) setSaved(Boolean(data?.is_saved));
+    })();
+    return () => { cancelled = true; };
+  }, [genId]);
+
+  const toggleSave = async () => {
+    if (!genId) { toast.error("Nothing to save yet"); return; }
+    if (savingToggle) return;
+    setSavingToggle(true);
+    const next = !saved;
+    setSaved(next); // optimistic
+    const { error } = await supabase
+      .from("generations")
+      .update({ is_saved: next })
+      .eq("id", genId);
+    if (error) {
+      setSaved(!next); // revert
+      toast.error("Couldn't update save state");
+    } else {
+      toast.success(next ? "Saved to your gallery!" : "Removed from saved");
+    }
+    setSavingToggle(false);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -84,7 +116,7 @@ const Generate = () => {
         {/* LEFT — OUTPUT */}
         <main className="relative flex flex-col bg-muted/30 border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-ink min-h-0">
           <div className="flex-1 flex flex-col p-4 md:p-6 min-h-0 lg:h-[calc(100vh-4rem-3px)]">
-            {/* Toolbar (zoom only — Save moved to image, Customise moved below) */}
+            {/* Toolbar (zoom + download) */}
             <div className="flex flex-wrap items-center gap-2 mb-3 flex-shrink-0">
               <div className="flex bauhaus-border bg-background rounded-2xl overflow-hidden">
                 <button
@@ -105,6 +137,15 @@ const Generate = () => {
                   <ZoomIn size={16} />
                 </button>
               </div>
+              {imageUrl && !loading && (
+                <div className="ml-auto">
+                  <DownloadDropdown
+                    exportCanvas={exportCanvas}
+                    filenameBase={`creonix-${genId ?? "image"}`}
+                    variant="primary"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Output frame */}
@@ -153,21 +194,19 @@ const Generate = () => {
                   </div>
                 )}
 
-                {/* Save to Gallery — TOP RIGHT, absolute */}
+                {/* Save / Unsave to Gallery — TOP RIGHT, absolute */}
                 {imageUrl && !loading && (
                   <button
-                    onClick={() => {
-                      if (!genId) { toast.error("Nothing to save yet"); return; }
-                      setSaved(true);
-                      toast.success("Saved to your gallery!");
-                    }}
-                    className="group absolute top-3 right-3 z-10 inline-flex items-center justify-center transition-transform hover:scale-[1.08]"
+                    onClick={toggleSave}
+                    disabled={savingToggle}
+                    className="group absolute top-3 right-3 z-10 inline-flex items-center justify-center transition-transform hover:scale-[1.08] disabled:opacity-60"
                     style={{
                       width: 44,
                       height: 44,
                       transitionDuration: "150ms",
                     }}
-                    aria-label={saved ? "Saved!" : "Save to Gallery"}
+                    aria-label={saved ? "Unsave from Gallery" : "Save to Gallery"}
+                    aria-pressed={saved}
                   >
                     <span
                       className="inline-flex items-center justify-center"
@@ -183,7 +222,7 @@ const Generate = () => {
                       <Bookmark size={16} fill={saved ? "#F5C400" : "none"} />
                     </span>
                     <span className="pointer-events-none absolute top-full mt-1 right-0 whitespace-nowrap bg-ink text-ink-foreground text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                      {saved ? "Saved!" : "Save to Gallery"}
+                      {saved ? "Click to Unsave" : "Save to Gallery"}
                     </span>
                   </button>
                 )}
@@ -200,15 +239,6 @@ const Generate = () => {
                   </div>
                 )}
 
-                {imageUrl && !loading && (
-                  <div className="absolute bottom-3 right-3 z-10">
-                    <DownloadDropdown
-                      exportCanvas={exportCanvas}
-                      filenameBase={`creonix-${genId ?? "image"}`}
-                      variant="primary"
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Customise Colours button — directly BELOW image, full width */}
