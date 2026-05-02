@@ -104,7 +104,7 @@ const Generate = () => {
         {/* LEFT — OUTPUT */}
         <main className="relative flex flex-col bg-muted/30 border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-ink min-h-0">
           <div className="flex-1 flex flex-col p-4 md:p-6 min-h-0 lg:h-[calc(100vh-4rem-3px)]">
-            {/* Toolbar (zoom only — Save moved to image, Customise moved below) */}
+            {/* Toolbar (zoom + download) */}
             <div className="flex flex-wrap items-center gap-2 mb-3 flex-shrink-0">
               <div className="flex bauhaus-border bg-background rounded-2xl overflow-hidden">
                 <button
@@ -125,6 +125,15 @@ const Generate = () => {
                   <ZoomIn size={16} />
                 </button>
               </div>
+              {imageUrl && !loading && (
+                <div className="ml-auto">
+                  <DownloadDropdown
+                    exportCanvas={exportCanvas}
+                    filenameBase={`creonix-${genId ?? "image"}`}
+                    variant="primary"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Output frame */}
