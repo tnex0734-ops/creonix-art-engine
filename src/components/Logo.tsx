@@ -4,20 +4,28 @@ type Size = "sm" | "md" | "lg" | "xl";
 const HEIGHTS: Record<Size, number> = { sm: 28, md: 40, lg: 56, xl: 80 };
 
 /**
- * CREONIX — Bauhaus geometric wordmark v2.
+ * CREONIX — Bauhaus geometric wordmark v3.
  *
- * A bolder, more confident take. Built on a strict 100-unit grid where every
- * letter is composed from pure circles, rectangles, and triangles — no
- * outlines. Inspired by Herbert Bayer's Universal alphabet and the Bauhaus
- * Dessau signage, with a modern, sticker-flat finish.
+ * Inspired by playful Bauhaus reinterpretations of famous wordmarks (think the
+ * geometric "Google" study): each letter is built from overlapping circles,
+ * semi-circles, rectangles, and triangles in a primary palette. Shapes are
+ * allowed to bleed into each other — that overlap is the personality.
  *
- * Highlights:
- *  • The "O" is a chunky red ring with a yellow dot — the brand "eye".
- *  • The "C" mirrors the O as an open ring, in blue.
- *  • The "X" is two solid bars, red + blue, crossing through a yellow square.
- *  • Negative-space cuts replace painted bars where possible (true Bauhaus).
- *  • Mark variant = the iconic O + X stacked into a compact monogram badge.
+ * Palette: cobalt blue, crimson red, sun yellow, deep teal, warm orange,
+ * indigo. Flat, no outlines, no gradients.
  */
+
+// --- Palette ----------------------------------------------------------------
+const C = {
+  blue: "#1F3FB0",      // cobalt
+  red: "#D43A2F",       // crimson
+  yellow: "#F4C518",    // sun
+  teal: "#114B45",      // deep teal
+  orange: "#E8632A",    // warm orange
+  indigo: "#3B3F9E",    // muted indigo
+  lilac: "#7E7BB8",     // dusty lilac (overlap accent)
+};
+
 export const Logo = ({
   size = "md",
   variant = "full",
@@ -28,18 +36,10 @@ export const Logo = ({
   onDark?: boolean;
 }) => {
   const h = HEIGHTS[size];
-
-  const RED = "hsl(var(--primary))";
-  const BLUE = "hsl(var(--secondary))";
-  const YEL = "hsl(var(--accent))";
-  const INK = onDark ? "hsl(var(--ink-foreground))" : "hsl(var(--ink))";
   const BG = onDark ? "hsl(var(--ink))" : "hsl(var(--background))";
 
-  const TOP = 8;
-  const BOT = 92;
-
   if (variant === "mark") {
-    // Compact badge: O (red ring + yellow dot) overlapped by X cross.
+    // Compact monogram: overlapping C (blue ring) + O (red disc with yellow overlap)
     const W = 100;
     const w = (h * W) / 100;
     return (
@@ -51,195 +51,126 @@ export const Logo = ({
         aria-label="Creonix"
         role="img"
       >
-        {/* Yellow square anchor */}
-        <rect x={18} y={18} width={64} height={64} fill={YEL} />
-        {/* Red ring (O) */}
-        <circle cx={50} cy={50} r={34} fill={RED} />
-        <circle cx={50} cy={50} r={16} fill={BG} />
-        {/* Blue diagonal bar (X stroke 1) */}
-        <rect
-          x={44}
-          y={6}
-          width={12}
-          height={88}
-          fill={BLUE}
-          transform="rotate(45 50 50)"
+        {/* C — blue ring with mouth */}
+        <circle cx={38} cy={50} r={32} fill={C.blue} />
+        <circle cx={38} cy={50} r={18} fill={BG} />
+        <rect x={38} y={38} width={36} height={24} fill={BG} />
+        {/* lilac inner accent (the overlap dot) */}
+        <circle cx={42} cy={50} r={8} fill={C.lilac} />
+        {/* O — red disc */}
+        <circle cx={66} cy={50} r={28} fill={C.red} />
+        {/* yellow overlap wedge */}
+        <path
+          d="M 55 30 A 28 28 0 0 1 55 70 A 32 32 0 0 0 55 30 Z"
+          fill={C.yellow}
         />
-        {/* Ink dot — the "eye" */}
-        <circle cx={50} cy={50} r={6} fill={INK} />
       </svg>
     );
   }
 
-  // Full wordmark — 7 letters laid out on a strict grid.
-  // Cell width 70, gap 14, side padding 10. Total = 10 + 7*70 + 6*14 + 10 = 594.
-  const cell = 70;
-  const gap = 14;
-  const W = 10 + 7 * cell + 6 * gap + 10;
-  const w = (h * W) / 100;
-  const xs = [0, 1, 2, 3, 4, 5, 6].map((i) => 10 + i * (cell + gap));
+  // Full wordmark CREONIX — 7 letters, each its own glyph block.
+  // Layout uses variable widths and intentional overlaps.
+  const VB_W = 720;
+  const VB_H = 100;
+  const w = (h * VB_W) / VB_H;
 
   return (
     <svg
       height={h}
       width={w}
-      viewBox={`0 0 ${W} 100`}
+      viewBox={`0 0 ${VB_W} ${VB_H}`}
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Creonix"
       role="img"
     >
-      <Letter_C x={xs[0]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
-      <Letter_R x={xs[1]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
-      <Letter_E x={xs[2]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
-      <Letter_O x={xs[3]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
-      <Letter_N x={xs[4]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
-      <Letter_I x={xs[5]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
-      <Letter_X x={xs[6]} top={TOP} bot={BOT} red={RED} blue={BLUE} yel={YEL} ink={INK} bg={BG} />
+      {/* C — Blue ring + lilac inner overlap (Pac-man opening right) */}
+      <g>
+        <circle cx={50} cy={50} r={42} fill={C.blue} />
+        <circle cx={50} cy={50} r={26} fill={BG} />
+        <rect x={50} y={36} width={48} height={28} fill={BG} />
+        <circle cx={56} cy={50} r={12} fill={C.lilac} />
+      </g>
+
+      {/* R — Red disc + yellow striped half-disc overlap (the "bowl"),
+              indigo rectangle leg drops below baseline. */}
+      <g transform="translate(110 0)">
+        {/* bowl: red full disc */}
+        <circle cx={45} cy={45} r={40} fill={C.red} />
+        {/* yellow striped overlap on the right half */}
+        <defs>
+          <pattern id="stripes-y" patternUnits="userSpaceOnUse" width={6} height={6} patternTransform="rotate(0)">
+            <rect width={6} height={6} fill={C.yellow} />
+            <rect width={6} height={2} y={2} fill={C.red} />
+          </pattern>
+        </defs>
+        <path
+          d="M 45 5 A 40 40 0 0 1 45 85 Z"
+          fill="url(#stripes-y)"
+        />
+        {/* leg — indigo rectangle */}
+        <rect x={38} y={60} width={20} height={40} fill={C.indigo} />
+      </g>
+
+      {/* E — Yellow disc with red horizontal bar overlap (an abstract "e") */}
+      <g transform="translate(210 0)">
+        <circle cx={45} cy={50} r={40} fill={C.yellow} />
+        <rect x={5} y={44} width={80} height={14} fill={C.red} />
+        {/* small teal bite */}
+        <circle cx={78} cy={50} r={10} fill={C.teal} />
+      </g>
+
+      {/* O — Teal disc + orange semi-circle overlap on the right */}
+      <g transform="translate(310 0)">
+        <circle cx={45} cy={50} r={42} fill={C.teal} />
+        <path
+          d="M 45 8 A 42 42 0 0 1 45 92 Z"
+          fill={C.orange}
+        />
+        {/* yellow wedge slice at bottom-right */}
+        <path
+          d="M 45 50 L 87 50 A 42 42 0 0 1 45 92 Z"
+          fill={C.yellow}
+        />
+      </g>
+
+      {/* N — Two indigo rectangles + red diagonal slab between them */}
+      <g transform="translate(410 0)">
+        <rect x={5} y={8} width={20} height={84} fill={C.indigo} />
+        <rect x={65} y={8} width={20} height={84} fill={C.indigo} />
+        <polygon points="25,8 39,8 85,92 71,92" fill={C.red} />
+        {/* yellow square overlap at center */}
+        <rect x={40} y={42} width={16} height={16} fill={C.yellow} />
+      </g>
+
+      {/* I — Yellow tall rectangle with blue circle dot on top, red base */}
+      <g transform="translate(510 0)">
+        <rect x={20} y={20} width={24} height={62} fill={C.yellow} />
+        <circle cx={32} cy={14} r={12} fill={C.blue} />
+        <rect x={6} y={82} width={52} height={10} fill={C.red} />
+      </g>
+
+      {/* X — Two crossing rectangles (red + blue) with orange center dot */}
+      <g transform="translate(580 0)">
+        <rect
+          x={30}
+          y={5}
+          width={20}
+          height={90}
+          fill={C.red}
+          transform="rotate(28 40 50)"
+        />
+        <rect
+          x={30}
+          y={5}
+          width={20}
+          height={90}
+          fill={C.blue}
+          transform="rotate(-28 40 50)"
+        />
+        <circle cx={40} cy={50} r={10} fill={C.orange} />
+        {/* yellow corner accent */}
+        <rect x={68} y={70} width={16} height={16} fill={C.yellow} />
+      </g>
     </svg>
-  );
-};
-
-type LP = {
-  x: number;
-  top: number;
-  bot: number;
-  red: string;
-  blue: string;
-  yel: string;
-  ink: string;
-  bg: string;
-};
-
-// C — Open blue ring, mouth right. Bold, geometric.
-const Letter_C = ({ x, top, bot, blue, bg, yel }: LP) => {
-  const cx = x + 35;
-  const cy = (top + bot) / 2;
-  const r = (bot - top) / 2;
-  const inner = r - 13;
-  return (
-    <g>
-      <circle cx={cx} cy={cy} r={r} fill={blue} />
-      <circle cx={cx} cy={cy} r={inner} fill={bg} />
-      {/* mouth cut */}
-      <rect x={cx} y={cy - 11} width={r + 2} height={22} fill={bg} />
-      {/* yellow accent tab */}
-      <rect x={cx + r - 8} y={cy - 11} width={8} height={6} fill={yel} />
-      <rect x={cx + r - 8} y={cy + 5} width={8} height={6} fill={yel} />
-    </g>
-  );
-};
-
-// R — Solid red stem, blue half-disc bowl, yellow leg triangle.
-const Letter_R = ({ x, top, bot, red, blue, yel }: LP) => {
-  const h = bot - top;
-  const stemW = 18;
-  const bowlH = h * 0.52;
-  return (
-    <g>
-      <rect x={x} y={top} width={stemW} height={h} fill={red} />
-      {/* bowl */}
-      <path
-        d={`M ${x + stemW} ${top} A ${bowlH / 2} ${bowlH / 2} 0 0 1 ${x + stemW} ${top + bowlH} Z`}
-        fill={blue}
-      />
-      {/* leg */}
-      <polygon
-        points={`${x + stemW},${top + bowlH - 4} ${x + stemW + 22},${top + bowlH - 4} ${x + 60},${bot} ${x + stemW + 4},${bot}`}
-        fill={yel}
-      />
-    </g>
-  );
-};
-
-// E — Three yellow horizontal bars + red stem. Crisp, blocky.
-const Letter_E = ({ x, top, bot, yel, red }: LP) => {
-  const h = bot - top;
-  const w = 60;
-  const stemW = 18;
-  const barH = 16;
-  return (
-    <g>
-      <rect x={x} y={top} width={stemW} height={h} fill={red} />
-      <rect x={x} y={top} width={w} height={barH} fill={yel} />
-      <rect x={x} y={top + (h - barH) / 2} width={w * 0.78} height={barH} fill={yel} />
-      <rect x={x} y={bot - barH} width={w} height={barH} fill={yel} />
-    </g>
-  );
-};
-
-// O — The hero. Red ring + yellow dot. The "Creonix eye."
-const Letter_O = ({ x, top, bot, red, yel, bg }: LP) => {
-  const cx = x + 35;
-  const cy = (top + bot) / 2;
-  const r = (bot - top) / 2;
-  return (
-    <g>
-      <circle cx={cx} cy={cy} r={r} fill={red} />
-      <circle cx={cx} cy={cy} r={r - 14} fill={bg} />
-      <circle cx={cx} cy={cy} r={r - 26} fill={yel} />
-    </g>
-  );
-};
-
-// N — Two blue posts joined by a yellow diagonal slab.
-const Letter_N = ({ x, top, bot, blue, yel }: LP) => {
-  const h = bot - top;
-  const stemW = 18;
-  const rightX = x + 70 - stemW;
-  return (
-    <g>
-      <rect x={x} y={top} width={stemW} height={h} fill={blue} />
-      <rect x={rightX} y={top} width={stemW} height={h} fill={blue} />
-      <polygon
-        points={`${x + stemW},${top} ${x + stemW + 14},${top} ${rightX + stemW},${bot} ${rightX - 14 + stemW},${bot}`}
-        fill={yel}
-      />
-    </g>
-  );
-};
-
-// I — Yellow stem with red square caps. Mini totem.
-const Letter_I = ({ x, top, bot, yel, red }: LP) => {
-  const h = bot - top;
-  const w = 40;
-  const stemW = 18;
-  const capH = 16;
-  const stemX = x + (w - stemW) / 2;
-  return (
-    <g>
-      <rect x={x} y={top} width={w} height={capH} fill={red} />
-      <rect x={stemX} y={top} width={stemW} height={h} fill={yel} />
-      <rect x={x} y={bot - capH} width={w} height={capH} fill={red} />
-    </g>
-  );
-};
-
-// X — Two crossing bars, red over blue, with a yellow square at the heart.
-const Letter_X = ({ x, top, bot, red, blue, yel }: LP) => {
-  const h = bot - top;
-  const cx = x + 35;
-  const cy = (top + bot) / 2;
-  const barW = 18;
-  const barH = h * 1.12;
-  return (
-    <g>
-      <rect
-        x={cx - barW / 2}
-        y={cy - barH / 2}
-        width={barW}
-        height={barH}
-        fill={blue}
-        transform={`rotate(-45 ${cx} ${cy})`}
-      />
-      <rect
-        x={cx - barW / 2}
-        y={cy - barH / 2}
-        width={barW}
-        height={barH}
-        fill={red}
-        transform={`rotate(45 ${cx} ${cy})`}
-      />
-      <rect x={cx - 6} y={cy - 6} width={12} height={12} fill={yel} />
-    </g>
   );
 };
