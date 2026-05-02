@@ -75,7 +75,19 @@ const Generate = () => {
 
   const [saved, setSaved] = useState(false);
   const [savingToggle, setSavingToggle] = useState(false);
-  useEffect(() => { setSaved(false); }, [genId]);
+  useEffect(() => {
+    if (!genId) { setSaved(false); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("generations")
+        .select("is_saved")
+        .eq("id", genId)
+        .maybeSingle();
+      if (!cancelled) setSaved(Boolean(data?.is_saved));
+    })();
+    return () => { cancelled = true; };
+  }, [genId]);
 
   const toggleSave = async () => {
     if (!genId) { toast.error("Nothing to save yet"); return; }
