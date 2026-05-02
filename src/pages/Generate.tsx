@@ -182,21 +182,19 @@ const Generate = () => {
                   </div>
                 )}
 
-                {/* Save to Gallery — TOP RIGHT, absolute */}
+                {/* Save / Unsave to Gallery — TOP RIGHT, absolute */}
                 {imageUrl && !loading && (
                   <button
-                    onClick={() => {
-                      if (!genId) { toast.error("Nothing to save yet"); return; }
-                      setSaved(true);
-                      toast.success("Saved to your gallery!");
-                    }}
-                    className="group absolute top-3 right-3 z-10 inline-flex items-center justify-center transition-transform hover:scale-[1.08]"
+                    onClick={toggleSave}
+                    disabled={savingToggle}
+                    className="group absolute top-3 right-3 z-10 inline-flex items-center justify-center transition-transform hover:scale-[1.08] disabled:opacity-60"
                     style={{
                       width: 44,
                       height: 44,
                       transitionDuration: "150ms",
                     }}
-                    aria-label={saved ? "Saved!" : "Save to Gallery"}
+                    aria-label={saved ? "Unsave from Gallery" : "Save to Gallery"}
+                    aria-pressed={saved}
                   >
                     <span
                       className="inline-flex items-center justify-center"
@@ -212,7 +210,7 @@ const Generate = () => {
                       <Bookmark size={16} fill={saved ? "#F5C400" : "none"} />
                     </span>
                     <span className="pointer-events-none absolute top-full mt-1 right-0 whitespace-nowrap bg-ink text-ink-foreground text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                      {saved ? "Saved!" : "Save to Gallery"}
+                      {saved ? "Click to Unsave" : "Save to Gallery"}
                     </span>
                   </button>
                 )}
