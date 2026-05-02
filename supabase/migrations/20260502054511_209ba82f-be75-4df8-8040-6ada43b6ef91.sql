@@ -1,0 +1,1 @@
+ALTER TABLE public.generations ADD COLUMN IF NOT EXISTS is_saved boolean NOT NULL DEFAULT false;
