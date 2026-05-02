@@ -227,15 +227,6 @@ const Generate = () => {
                   </div>
                 )}
 
-                {imageUrl && !loading && (
-                  <div className="absolute bottom-3 right-3 z-10">
-                    <DownloadDropdown
-                      exportCanvas={exportCanvas}
-                      filenameBase={`creonix-${genId ?? "image"}`}
-                      variant="primary"
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Customise Colours button — directly BELOW image, full width */}
