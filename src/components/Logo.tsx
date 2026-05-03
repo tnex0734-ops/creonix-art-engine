@@ -4,11 +4,11 @@ type Size = "sm" | "md" | "lg" | "xl";
 const HEIGHTS: Record<Size, number> = { sm: 28, md: 40, lg: 56, xl: 80 };
 
 /**
- * CREONIX — Minimal Bauhaus wordmark v4.
+ * CREONIX — Minimal Bauhaus wordmark v5.
  *
- * One bold geometric mark + clean Archivo-style wordmark. Three primaries only:
- * red, blue, yellow + ink. The mark is a circle (yellow) cut by a red
- * quarter-disc and a blue square — the holy trinity of Bauhaus.
+ * Mark: yellow circle + red quarter + blue square, with a black pencil/nib
+ * cutting diagonally across — signalling illustration/creation.
+ * Wordmark: Bebas Neue (tall, narrow display) for clear brand presence.
  */
 
 export const Logo = ({
@@ -22,11 +22,12 @@ export const Logo = ({
 }) => {
   const h = HEIGHTS[size];
   const ink = onDark ? "hsl(var(--ink-foreground))" : "hsl(var(--ink))";
+  const bg = onDark ? "hsl(var(--ink))" : "hsl(var(--background))";
   const red = "hsl(var(--primary))";
   const blue = "hsl(var(--secondary))";
   const yellow = "hsl(var(--accent))";
 
-  // --- The mark: yellow circle + red quarter + blue square
+  // The mark — Bauhaus shapes + diagonal pencil
   const Mark = ({ s = 100 }: { s?: number }) => (
     <g>
       {/* yellow circle */}
@@ -38,8 +39,50 @@ export const Logo = ({
       />
       {/* blue square — top-right overlay */}
       <rect x={s / 2} y={0} width={s / 2} height={s / 2} fill={blue} />
-      {/* ink dot at center for tension */}
-      <circle cx={s / 2} cy={s / 2} r={s * 0.06} fill={ink} />
+
+      {/* PENCIL — diagonal from top-left to bottom-right */}
+      <g transform={`rotate(45 ${s / 2} ${s / 2})`}>
+        {/* pencil body (ink) */}
+        <rect
+          x={s * 0.18}
+          y={s * 0.46}
+          width={s * 0.5}
+          height={s * 0.08}
+          fill={ink}
+        />
+        {/* yellow ferrule band */}
+        <rect
+          x={s * 0.62}
+          y={s * 0.46}
+          width={s * 0.06}
+          height={s * 0.08}
+          fill={yellow}
+          stroke={ink}
+          strokeWidth={s * 0.012}
+        />
+        {/* pink eraser */}
+        <rect
+          x={s * 0.68}
+          y={s * 0.46}
+          width={s * 0.08}
+          height={s * 0.08}
+          fill={red}
+          stroke={ink}
+          strokeWidth={s * 0.012}
+        />
+        {/* sharpened tip — triangle pointing left */}
+        <polygon
+          points={`${s * 0.18},${s * 0.46} ${s * 0.18},${s * 0.54} ${s * 0.08},${s * 0.5}`}
+          fill={bg}
+          stroke={ink}
+          strokeWidth={s * 0.012}
+        />
+        {/* graphite point */}
+        <polygon
+          points={`${s * 0.12},${s * 0.485} ${s * 0.12},${s * 0.515} ${s * 0.08},${s * 0.5}`}
+          fill={ink}
+        />
+      </g>
     </g>
   );
 
@@ -58,9 +101,9 @@ export const Logo = ({
     );
   }
 
-  // Full lockup: mark + "CREONIX" wordmark
+  // Full lockup: mark + "CREONIX" wordmark in Bebas Neue display font
   const VB_H = 100;
-  const VB_W = 460;
+  const VB_W = 480;
   const w = (h * VB_W) / VB_H;
 
   return (
@@ -75,12 +118,13 @@ export const Logo = ({
       <Mark s={100} />
       <text
         x={120}
-        y={72}
+        y={78}
         fill={ink}
         style={{
-          fontFamily: "'Archivo Black', 'Inter', sans-serif",
-          fontSize: 64,
-          letterSpacing: 2,
+          fontFamily: "'Bebas Neue', 'Archivo Black', sans-serif",
+          fontSize: 84,
+          fontWeight: 400,
+          letterSpacing: 6,
         }}
       >
         CREONIX
