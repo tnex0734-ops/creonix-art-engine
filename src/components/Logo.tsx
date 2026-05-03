@@ -101,10 +101,26 @@ export const Logo = ({
     );
   }
 
-  // Full lockup: mark + "CREONIX" wordmark in Bebas Neue display font
+  // Full lockup: mark + multicolor "CREONIX" wordmark in hero display style
   const VB_H = 100;
-  const VB_W = 480;
+  const VB_W = 540;
   const w = (h * VB_W) / VB_H;
+
+  // Per-letter color palette matching hero (ink, primary red, secondary blue, accent yellow)
+  const letters: Array<{ ch: string; fill: string; italic?: boolean }> = [
+    { ch: "C", fill: ink },
+    { ch: "R", fill: red },
+    { ch: "E", fill: ink },
+    { ch: "O", fill: blue },
+    { ch: "N", fill: ink },
+    { ch: "I", fill: red, italic: true },
+    { ch: "X", fill: ink },
+  ];
+
+  // Layout letters with the "O" wrapped in a yellow Bauhaus block (rotated, bordered)
+  const startX = 120;
+  const letterW = 52;
+  const baselineY = 76;
 
   return (
     <svg
@@ -116,19 +132,40 @@ export const Logo = ({
       role="img"
     >
       <Mark s={100} />
-      <text
-        x={120}
-        y={78}
-        fill={ink}
+
+      {/* Yellow rotated block behind the "O" — echoes hero SPEED chip */}
+      <g transform={`rotate(-4 ${startX + letterW * 3 + letterW / 2} ${baselineY - 30})`}>
+        <rect
+          x={startX + letterW * 3 - 6}
+          y={baselineY - 60}
+          width={letterW + 12}
+          height={72}
+          fill={yellow}
+          stroke={ink}
+          strokeWidth={4}
+        />
+      </g>
+
+      <g
         style={{
-          fontFamily: "'Bebas Neue', 'Archivo Black', sans-serif",
-          fontSize: 84,
-          fontWeight: 400,
-          letterSpacing: 6,
+          fontFamily: "'Archivo Black', 'Inter', sans-serif",
+          fontWeight: 900,
+          fontSize: 72,
+          letterSpacing: -1,
         }}
       >
-        CREONIX
-      </text>
+        {letters.map((l, i) => (
+          <text
+            key={i}
+            x={startX + i * letterW}
+            y={baselineY}
+            fill={l.fill}
+            fontStyle={l.italic ? "italic" : "normal"}
+          >
+            {l.ch}
+          </text>
+        ))}
+      </g>
     </svg>
   );
 };
