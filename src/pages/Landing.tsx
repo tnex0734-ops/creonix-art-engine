@@ -74,14 +74,6 @@ const Landing = () => {
               </span>
               v1.0 · AI illustration engine
             </div>
-            <div className="flex items-center gap-3 text-xs font-extrabold uppercase">
-              <div className="flex -space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-accent text-ink" strokeWidth={2.5} />
-                ))}
-              </div>
-              <span className="text-ink">2,400+ designers shipping daily</span>
-            </div>
           </div>
 
           {/* Headline — massive, asymmetric */}
