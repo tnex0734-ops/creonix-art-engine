@@ -7,6 +7,7 @@ import { STYLES } from "@/lib/styles";
 import { DownloadDropdown } from "@/components/DownloadDropdown";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { GalleryPreviewModal } from "@/components/GalleryPreviewModal";
 
 type Generation = {
   id: string;
