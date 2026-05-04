@@ -48,7 +48,10 @@ const Landing = () => {
       <Navbar />
 
       {/* HERO — asymmetric Bauhaus grid */}
-      <section className="relative overflow-hidden border-b-[3px] border-ink bg-background">
+      <section
+        className="relative overflow-hidden border-b-[3px] border-ink bg-background flex items-center"
+        style={{ height: "calc(100vh - 64px)", minHeight: "560px" }}
+      >
         {/* Background grid overlay */}
         <div
           className="absolute inset-0 opacity-[0.06] pointer-events-none"
@@ -64,10 +67,10 @@ const Landing = () => {
         <div className="absolute top-32 right-1/3 h-6 w-6 bg-primary border-[3px] border-ink rotate-45 hidden lg:block" />
         <div className="absolute bottom-24 left-1/4 h-4 w-4 rounded-full bg-secondary border-[2px] border-ink hidden lg:block" />
 
-        <div className="container relative pt-12 md:pt-16 pb-0">
+        <div className="container relative w-full">
           {/* Top row: tag + meta */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-accent text-ink text-xs font-extrabold uppercase">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-accent text-ink text-[11px] font-extrabold uppercase">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
@@ -77,14 +80,14 @@ const Landing = () => {
           </div>
 
           {/* Headline — massive, asymmetric */}
-          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center">
             <div className="lg:col-span-8 relative">
-              <h1 className="heading-display text-[clamp(3rem,9vw,8.5rem)] text-ink leading-[0.85] text-balance">
+              <h1 className="heading-display text-ink text-balance" style={{ fontSize: "clamp(28px, 5.5vw, 80px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}>
                 <span className="block">DESIGN</span>
                 <span className="block">
                   AT THE
-                  <span className="inline-flex items-center mx-3 md:mx-5 align-middle">
-                    <span className="relative inline-block bg-primary text-primary-foreground bauhaus-border-thick px-4 md:px-6 py-1 -rotate-2 bauhaus-shadow">
+                  <span className="inline-flex items-center mx-2 md:mx-3 align-middle">
+                    <span className="relative inline-block bg-primary text-primary-foreground bauhaus-border-thick -rotate-2 bauhaus-shadow" style={{ padding: "4px 12px" }}>
                       SPEED
                     </span>
                   </span>
@@ -100,7 +103,7 @@ const Landing = () => {
               ref={tiltRef}
               onMouseMove={handleTiltMove}
               onMouseLeave={handleTiltLeave}
-              className="lg:col-span-4 relative min-h-[280px] lg:min-h-[420px] [perspective:1200px]"
+              className="lg:col-span-4 relative min-h-[220px] lg:min-h-[340px] [perspective:1200px]"
               style={{ ["--mx" as never]: 0, ["--my" as never]: 0 } as React.CSSProperties}
             >
               {/* Card 1 — back */}
