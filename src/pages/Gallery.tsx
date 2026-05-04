@@ -54,6 +54,20 @@ const Gallery = () => {
     toast.success("Deleted");
   };
 
+  const openPreview = (id: string) => {
+    sessionStorage.setItem("gallery-scroll", String(window.scrollY));
+    const i = filtered.findIndex((g) => g.id === id);
+    if (i >= 0) setPreviewIndex(i);
+  };
+
+  const closePreview = () => {
+    setPreviewIndex(null);
+    requestAnimationFrame(() => {
+      const y = Number(sessionStorage.getItem("gallery-scroll") || 0);
+      window.scrollTo({ top: y });
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
