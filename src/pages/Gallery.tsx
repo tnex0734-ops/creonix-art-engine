@@ -7,6 +7,7 @@ import { STYLES } from "@/lib/styles";
 import { DownloadDropdown } from "@/components/DownloadDropdown";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { GalleryPreviewModal } from "@/components/GalleryPreviewModal";
 
 type Generation = {
   id: string;
@@ -21,6 +22,7 @@ const Gallery = () => {
   const [items, setItems] = useState<Generation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("All");
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -50,6 +52,20 @@ const Gallery = () => {
     if (error) return toast.error(error.message);
     setItems((arr) => arr.filter((i) => i.id !== id));
     toast.success("Deleted");
+  };
+
+  const openPreview = (id: string) => {
+    sessionStorage.setItem("gallery-scroll", String(window.scrollY));
+    const i = filtered.findIndex((g) => g.id === id);
+    if (i >= 0) setPreviewIndex(i);
+  };
+
+  const closePreview = () => {
+    setPreviewIndex(null);
+    requestAnimationFrame(() => {
+      const y = Number(sessionStorage.getItem("gallery-scroll") || 0);
+      window.scrollTo({ top: y });
+    });
   };
 
   return (
@@ -103,7 +119,11 @@ const Gallery = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filtered.map((g) => (
-              <article key={g.id} className="bauhaus-border bg-card hover-lift rounded-2xl">
+              <article
+                key={g.id}
+                onClick={() => openPreview(g.id)}
+                className="bauhaus-border bg-card rounded-2xl cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] hover:shadow-[8px_8px_0_0_hsl(var(--ink))]"
+              >
                 <div className="aspect-square bg-muted overflow-hidden rounded-t-[14px]">
                   <img src={g.image_url} alt={g.prompt} crossOrigin="anonymous" className="w-full h-full object-cover" loading="lazy" />
                 </div>
@@ -115,7 +135,7 @@ const Gallery = () => {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2lh]">{g.prompt}</p>
-                  <div className="flex gap-2 mt-3 items-center">
+                  <div className="flex gap-2 mt-3 items-center" onClick={(e) => e.stopPropagation()}>
                     <DownloadDropdown
                       imageUrl={g.image_url}
                       filenameBase={`creonix-${g.id}`}
@@ -137,6 +157,24 @@ const Gallery = () => {
           </div>
         )}
       </section>
+
+      {previewIndex !== null && filtered[previewIndex] && (
+        <GalleryPreviewModal
+          items={filtered}
+          index={previewIndex}
+          onClose={closePreview}
+          onIndexChange={setPreviewIndex}
+          onDeleted={(id) => {
+            setItems((arr) => arr.filter((i) => i.id !== id));
+            setPreviewIndex((idx) => {
+              if (idx === null) return null;
+              const remaining = filtered.length - 1;
+              if (remaining <= 0) return null;
+              return Math.min(idx, remaining - 1);
+            });
+          }}
+        />
+      )}
     </div>
   );
 };

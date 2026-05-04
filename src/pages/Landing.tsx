@@ -48,7 +48,10 @@ const Landing = () => {
       <Navbar />
 
       {/* HERO — asymmetric Bauhaus grid */}
-      <section className="relative overflow-hidden border-b-[3px] border-ink bg-background">
+      <section
+        className="relative overflow-hidden border-b-[3px] border-ink bg-background flex items-center"
+        style={{ height: "calc(100vh - 64px)", minHeight: "560px" }}
+      >
         {/* Background grid overlay */}
         <div
           className="absolute inset-0 opacity-[0.06] pointer-events-none"
@@ -64,10 +67,10 @@ const Landing = () => {
         <div className="absolute top-32 right-1/3 h-6 w-6 bg-primary border-[3px] border-ink rotate-45 hidden lg:block" />
         <div className="absolute bottom-24 left-1/4 h-4 w-4 rounded-full bg-secondary border-[2px] border-ink hidden lg:block" />
 
-        <div className="container relative pt-12 md:pt-16 pb-0">
+        <div className="container relative w-full">
           {/* Top row: tag + meta */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-accent text-ink text-xs font-extrabold uppercase">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bauhaus-border bg-accent text-ink text-[11px] font-extrabold uppercase">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
@@ -77,14 +80,14 @@ const Landing = () => {
           </div>
 
           {/* Headline — massive, asymmetric */}
-          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center">
             <div className="lg:col-span-8 relative">
-              <h1 className="heading-display text-[clamp(3rem,9vw,8.5rem)] text-ink leading-[0.85] text-balance">
+              <h1 className="heading-display text-ink text-balance" style={{ fontSize: "clamp(28px, 5.5vw, 80px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}>
                 <span className="block">DESIGN</span>
                 <span className="block">
                   AT THE
-                  <span className="inline-flex items-center mx-3 md:mx-5 align-middle">
-                    <span className="relative inline-block bg-primary text-primary-foreground bauhaus-border-thick px-4 md:px-6 py-1 -rotate-2 bauhaus-shadow">
+                  <span className="inline-flex items-center mx-2 md:mx-3 align-middle">
+                    <span className="relative inline-block bg-primary text-primary-foreground bauhaus-border-thick -rotate-2 bauhaus-shadow" style={{ padding: "4px 12px" }}>
                       SPEED
                     </span>
                   </span>
@@ -100,7 +103,7 @@ const Landing = () => {
               ref={tiltRef}
               onMouseMove={handleTiltMove}
               onMouseLeave={handleTiltLeave}
-              className="lg:col-span-4 relative min-h-[280px] lg:min-h-[420px] [perspective:1200px]"
+              className="lg:col-span-4 relative min-h-[220px] lg:min-h-[340px] [perspective:1200px]"
               style={{ ["--mx" as never]: 0, ["--my" as never]: 0 } as React.CSSProperties}
             >
               {/* Card 1 — back */}
@@ -157,13 +160,13 @@ const Landing = () => {
           </div>
 
           {/* Sub copy + CTAs row */}
-          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 mt-12 items-end">
+          <div className="grid lg:grid-cols-12 gap-4 lg:gap-6 mt-5 items-center">
             <div className="lg:col-span-5">
               <div className="flex items-start gap-3">
-                <div className="h-1.5 w-12 bg-primary mt-3 shrink-0" />
-                <p className="text-lg md:text-xl text-ink/80 font-medium">
+                <div className="h-1.5 w-10 bg-primary mt-2 shrink-0" />
+                <p className="text-ink/80 font-medium" style={{ fontSize: "clamp(13px, 1.2vw, 16px)", maxWidth: "480px", lineHeight: 1.6 }}>
                   Type a prompt. Pick a style. Ship in seconds.
-                  <span className="block text-muted-foreground text-base mt-1 font-normal">
+                  <span className="block text-muted-foreground mt-1 font-normal" style={{ fontSize: "clamp(12px, 1vw, 14px)" }}>
                     Twelve hand-tuned aesthetics, infinite directions — no design degree required.
                   </span>
                 </p>
@@ -173,7 +176,8 @@ const Landing = () => {
             <div className="lg:col-span-4 flex flex-wrap gap-3 items-center">
               <a
                 href="#styles"
-                className="inline-flex items-center gap-2 px-7 py-4 bg-background text-ink font-extrabold uppercase border-[2px] border-ink hover-lift text-sm rounded-2xl"
+                className="inline-flex items-center gap-2 px-6 bg-background text-ink font-extrabold uppercase border-[2px] border-ink hover-lift rounded-2xl"
+                style={{ height: 48, fontSize: 13 }}
               >
                 See Styles
               </a>
@@ -185,53 +189,54 @@ const Landing = () => {
                     requireAuth(() => navigate("/generate"), "create an illustration");
                   }
                 }}
-                className="group inline-flex items-center gap-3 px-10 py-4 bg-primary text-primary-foreground font-extrabold uppercase border-[2px] border-ink hover-lift text-sm rounded-2xl"
+                className="group inline-flex items-center gap-3 px-8 bg-primary text-primary-foreground font-extrabold uppercase border-[2px] border-ink hover-lift rounded-2xl"
+                style={{ height: 48, fontSize: 13 }}
               >
                 <span className="relative inline-flex h-2 w-2" aria-hidden>
                   <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
                 </span>
                 Start Here
-                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>
 
             <div className="lg:col-span-3 lg:text-right">
-              <div className="inline-block bauhaus-border bg-accent px-4 py-3">
+              <div className="inline-block bauhaus-border bg-accent px-3 py-2">
                 <div className="font-mono text-[10px] font-bold uppercase opacity-70">No card · Free tier</div>
-                <div className="heading-display text-2xl mt-1">START IN 30s</div>
+                <div className="heading-display text-xl mt-0.5">START IN 30s</div>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Marquee ticker */}
-        <div className="mt-14 border-t-[3px] border-ink bg-ink text-ink-foreground overflow-hidden">
-          <div className="flex gap-10 py-4 whitespace-nowrap animate-marquee">
-            {[...Array(2)].map((_, dup) => (
-              <div key={dup} className="flex gap-10 items-center shrink-0">
-                {[
-                  "FLAT 2.0",
-                  "ISOMETRIC",
-                  "3D CLAY",
-                  "GLASSMORPHISM",
-                  "RETRO REVIVAL",
-                  "PSYCHEDELIC",
-                  "CARTOON",
-                  "DIGITAL COLLAGE",
-                  "NATURE / ECO",
-                  "HAND-DRAWN",
-                  "DOODLE",
-                  "FOLK ART",
-                ].map((t) => (
-                  <div key={t} className="flex items-center gap-10 shrink-0">
-                    <span className="heading-display text-2xl md:text-3xl">{t}</span>
-                    <span className="h-3 w-3 rounded-full bg-accent shrink-0" />
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
+      {/* Marquee ticker */}
+      <section className="border-b-[3px] border-ink bg-ink text-ink-foreground overflow-hidden">
+        <div className="flex gap-10 py-4 whitespace-nowrap animate-marquee">
+          {[...Array(2)].map((_, dup) => (
+            <div key={dup} className="flex gap-10 items-center shrink-0">
+              {[
+                "FLAT 2.0",
+                "ISOMETRIC",
+                "3D CLAY",
+                "GLASSMORPHISM",
+                "RETRO REVIVAL",
+                "PSYCHEDELIC",
+                "CARTOON",
+                "DIGITAL COLLAGE",
+                "NATURE / ECO",
+                "HAND-DRAWN",
+                "DOODLE",
+                "FOLK ART",
+              ].map((t) => (
+                <div key={t} className="flex items-center gap-10 shrink-0">
+                  <span className="heading-display text-2xl md:text-3xl">{t}</span>
+                  <span className="h-3 w-3 rounded-full bg-accent shrink-0" />
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </section>
 
