@@ -22,7 +22,7 @@ const Generate = () => {
 
   const [style, setStyle] = useState<Style>(initialStyle);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(params.get("prompt") ?? "");
   const [history, setHistory] = useState<Msg[]>([]);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
