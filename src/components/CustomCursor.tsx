@@ -136,7 +136,7 @@ export const CustomCursor = () => {
     <div
       ref={wrapRef}
       aria-hidden
-      className="pointer-events-none fixed top-0 left-0 z-[100] h-8 w-8 transition-[filter] duration-100"
+      className="pointer-events-none fixed top-0 left-0 z-[999999] h-8 w-8 transition-[filter] duration-100"
       style={{
         backgroundImage: pose === "click" ? clickSvg.current : pointSvg.current,
         backgroundRepeat: "no-repeat",
