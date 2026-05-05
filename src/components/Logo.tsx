@@ -101,71 +101,41 @@ export const Logo = ({
     );
   }
 
-  // Full lockup: mark + multicolor "CREONIX" wordmark in hero display style
-  const VB_H = 100;
-  const VB_W = 540;
-  const w = (h * VB_W) / VB_H;
-
-  // Per-letter color palette matching hero (ink, primary red, secondary blue, accent yellow)
-  const letters: Array<{ ch: string; fill: string; italic?: boolean }> = [
-    { ch: "C", fill: ink },
-    { ch: "R", fill: red },
-    { ch: "E", fill: ink },
-    { ch: "O", fill: blue },
-    { ch: "N", fill: ink },
-    { ch: "I", fill: red, italic: true },
-    { ch: "X", fill: ink },
-  ];
-
-  // Layout letters with the "O" wrapped in a yellow Bauhaus block (rotated, bordered)
-  const startX = 120;
-  const letterW = 52;
-  const baselineY = 76;
+  // Full lockup: SVG mark + HTML wordmark (mirrors Footer styling exactly)
+  const fontSize = h * 0.85;
 
   return (
-    <svg
-      height={h}
-      width={w}
-      viewBox={`0 0 ${VB_W} ${VB_H}`}
-      xmlns="http://www.w3.org/2000/svg"
+    <span
+      className="inline-flex items-center gap-2"
       aria-label="Creonix"
       role="img"
     >
-      <Mark s={100} />
-
-      {/* Yellow rotated block behind the "O" — echoes hero SPEED chip */}
-      <g transform={`rotate(-4 ${startX + letterW * 3 + letterW / 2} ${baselineY - 30})`}>
-        <rect
-          x={startX + letterW * 3 - 6}
-          y={baselineY - 60}
-          width={letterW + 12}
-          height={72}
-          fill={yellow}
-          stroke={ink}
-          strokeWidth={4}
-        />
-      </g>
-
-      <g
-        style={{
-          fontFamily: "'Archivo Black', 'Inter', sans-serif",
-          fontWeight: 900,
-          fontSize: 72,
-          letterSpacing: -1,
-        }}
+      <svg
+        height={h}
+        width={h}
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
       >
-        {letters.map((l, i) => (
-          <text
-            key={i}
-            x={startX + i * letterW}
-            y={baselineY}
-            fill={l.fill}
-            fontStyle={l.italic ? "italic" : "normal"}
-          >
-            {l.ch}
-          </text>
-        ))}
-      </g>
-    </svg>
+        <Mark />
+      </svg>
+      <span
+        className="heading-display inline-flex items-center gap-0.5 leading-none"
+        style={{ fontSize }}
+      >
+        <span className="text-ink">C</span>
+        <span className="text-primary">R</span>
+        <span className="text-ink">E</span>
+        <span
+          className="relative inline-flex items-center justify-center -rotate-2 bg-accent bauhaus-border-thick bauhaus-shadow"
+          style={{ padding: `${h * 0.04}px ${h * 0.12}px` }}
+        >
+          <span className="text-secondary">O</span>
+        </span>
+        <span className="text-ink">N</span>
+        <span className="text-primary italic">I</span>
+        <span className="text-ink">X</span>
+      </span>
+    </span>
   );
 };
