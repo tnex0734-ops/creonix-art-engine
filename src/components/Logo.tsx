@@ -120,15 +120,15 @@ export const Logo = ({
         <Mark />
       </svg>
       <span
-        className="heading-display inline-flex items-center gap-0.5 leading-none"
-        style={{ fontSize }}
+        className="heading-display inline-flex items-center leading-none"
+        style={{ fontSize, gap: `${h * 0.06}px` }}
       >
         <span className="text-ink">C</span>
         <span className="text-primary">R</span>
         <span className="text-ink">E</span>
         <span
           className="relative inline-flex items-center justify-center -rotate-2 bg-accent bauhaus-border-thick bauhaus-shadow"
-          style={{ padding: `${h * 0.04}px ${h * 0.12}px` }}
+          style={{ padding: `${h * 0.04}px ${h * 0.12}px`, marginRight: `${h * 0.14}px` }}
         >
           <span className="text-secondary">O</span>
         </span>
