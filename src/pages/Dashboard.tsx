@@ -138,15 +138,15 @@ const Dashboard = () => {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="aspect-square bauhaus-border bg-muted animate-pulse rounded-2xl" />
+                <div key={i} className="bauhaus-border bg-muted animate-pulse rounded-2xl h-[140px] md:h-[160px] lg:h-[180px] xl:h-[200px]" />
               ))}
             </div>
           ) : recent.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
               {recent.map((g) => (
                 <RecentCard key={g.id} g={g} />
               ))}
@@ -224,9 +224,9 @@ const RecentCard = ({ g }: { g: Generation }) => {
   };
   const ts = new Date(g.created_at);
   return (
-    <article className="group relative bauhaus-border bg-card overflow-hidden hover-lift rounded-2xl">
-      <div className="aspect-square bg-muted overflow-hidden rounded-t-[14px]">
-        <img src={g.image_url} alt={g.prompt} className="w-full h-full object-cover" loading="lazy" />
+    <article className="group relative bauhaus-border bg-card overflow-hidden rounded-2xl cursor-pointer transition-all duration-150 ease-out hover:-translate-y-[3px] hover:shadow-[4px_4px_0_0_hsl(var(--ink))]">
+      <div className="bg-muted overflow-hidden rounded-t-[14px] h-[140px] md:h-[160px] lg:h-[180px] xl:h-[200px]">
+        <img src={g.image_url} alt={g.prompt} className="w-full h-full object-cover object-top transition-transform duration-200 group-hover:scale-[1.04]" loading="lazy" />
       </div>
       <div className="p-3 flex items-center justify-between gap-2 border-t-[3px] border-ink">
         <div className="min-w-0">
