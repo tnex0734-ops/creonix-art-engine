@@ -122,9 +122,9 @@ const Gallery = () => {
               <article
                 key={g.id}
                 onClick={() => openPreview(g.id)}
-                className="bauhaus-border bg-card rounded-2xl cursor-pointer transition-all duration-150 ease-out hover:scale-[1.02] hover:shadow-[8px_8px_0_0_hsl(var(--ink))]"
+                className="group bauhaus-border bg-card rounded-2xl cursor-pointer overflow-hidden transition-all duration-150 ease-out hover:-translate-y-[3px] hover:shadow-[4px_4px_0_0_hsl(var(--ink))]"
               >
-                <div className="aspect-square bg-muted overflow-hidden rounded-t-[14px]">
+                <div className="bg-muted overflow-hidden rounded-t-[14px] h-[140px] md:h-[160px] lg:h-[180px] xl:h-[200px]">
                   <img src={g.image_url} alt={g.prompt} crossOrigin="anonymous" className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div className="p-3 border-t-[3px] border-ink">
