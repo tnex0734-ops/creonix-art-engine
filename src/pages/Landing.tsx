@@ -191,10 +191,6 @@ const Landing = () => {
                 className="group inline-flex items-center gap-3 px-8 bg-primary text-primary-foreground font-extrabold uppercase border-[2px] border-ink hover-lift rounded-2xl"
                 style={{ height: 48, fontSize: 13 }}
               >
-                <span className="relative inline-flex h-2 w-2" aria-hidden>
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
-                </span>
                 Start Here
                 <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
