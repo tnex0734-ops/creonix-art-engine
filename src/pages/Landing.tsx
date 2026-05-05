@@ -163,7 +163,6 @@ const Landing = () => {
           <div className="grid lg:grid-cols-12 gap-4 lg:gap-6 mt-5 items-center">
             <div className="lg:col-span-5">
               <div className="flex items-start gap-3">
-                <div className="h-1.5 w-10 bg-primary mt-2 shrink-0" />
                 <p className="text-ink/80 font-medium" style={{ fontSize: "clamp(13px, 1.2vw, 16px)", maxWidth: "480px", lineHeight: 1.6 }}>
                   Type a prompt. Pick a style. Ship in seconds.
                   <span className="block text-muted-foreground mt-1 font-normal" style={{ fontSize: "clamp(12px, 1vw, 14px)" }}>
