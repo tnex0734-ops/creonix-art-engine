@@ -19,7 +19,8 @@ import type { ElementColors } from "@/components/ColourCustomiser";
 export function useColorizedCanvas(
   imageUrl: string | null,
   colors: ElementColors,
-  zoom: number
+  zoom: number,
+  transparent = false
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -64,13 +65,18 @@ export function useColorizedCanvas(
       dy: number,
       dw: number,
       dh: number,
-      bg: string
+      bg: string,
+      noBg: boolean
     ) => {
-      // 1. Background fill
+      // 1. Background fill (skip if transparent)
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, cw, ch);
+      if (!noBg) {
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, cw, ch);
+      } else {
+        ctx.clearRect(0, 0, cw, ch);
+      }
 
       // 2. Draw the image
       ctx.drawImage(img, dx, dy, dw, dh);
@@ -126,8 +132,12 @@ export function useColorizedCanvas(
 
     // Always at least draw background even if image not ready yet
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = colors.background;
-    ctx.fillRect(0, 0, cw, ch);
+    if (transparent) {
+      ctx.clearRect(0, 0, cw, ch);
+    } else {
+      ctx.fillStyle = colors.background;
+      ctx.fillRect(0, 0, cw, ch);
+    }
 
     if (!img) return;
 
@@ -139,8 +149,8 @@ export function useColorizedCanvas(
     const dx = (cw - dw) / 2;
     const dy = (ch - dh) / 2;
 
-    paint(ctx, img, cw, ch, dx, dy, dw, dh, colors.background);
-  }, [colors.background, zoom, paint]);
+    paint(ctx, img, cw, ch, dx, dy, dw, dh, colors.background, transparent);
+  }, [colors.background, zoom, paint, transparent]);
 
   // Redraw on: colors change, zoom change, image ready, container resize
   useEffect(() => {
@@ -169,11 +179,12 @@ export function useColorizedCanvas(
       const ctx = c.getContext("2d");
       if (!ctx) return null;
 
-      // Apply paint pipeline to produce a high-res static image
-      paint(ctx, img, w, h, 0, 0, w, h, bgWhite ? "#ffffff" : colors.background);
+      const useTransparent = transparent && !bgWhite;
+      const bg = bgWhite ? "#ffffff" : colors.background;
+      paint(ctx, img, w, h, 0, 0, w, h, bg, useTransparent);
       return c;
     },
-    [colors.background, paint]
+    [colors.background, paint, transparent]
   );
 
   return { canvasRef, containerRef, exportCanvas };

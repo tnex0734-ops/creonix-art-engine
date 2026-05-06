@@ -30,9 +30,10 @@ const Generate = () => {
   const [zoom, setZoom] = useState(1);
   const [showPalette, setShowPalette] = useState(false);
   const [colors, setColors] = useState<ElementColors>(DEFAULT_COLORS);
+  const [transparentBg, setTransparentBg] = useState(false);
 
   const historyRef = useRef<HTMLDivElement>(null);
-  const { canvasRef, containerRef, exportCanvas } = useColorizedCanvas(imageUrl, colors, zoom);
+  const { canvasRef, containerRef, exportCanvas } = useColorizedCanvas(imageUrl, colors, zoom, transparentBg);
 
   useEffect(() => {
     historyRef.current?.scrollTo({ top: historyRef.current.scrollHeight, behavior: "smooth" });
@@ -51,7 +52,7 @@ const Generate = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-illustration", {
-        body: { prompt: currentPrompt, style: style.name },
+        body: { prompt: currentPrompt, style: style.name, transparent: transparentBg },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -343,6 +344,31 @@ const Generate = () => {
               placeholder="Describe your illustration…"
               className="w-full h-24 p-3 bg-background bauhaus-border focus:outline-none focus:ring-4 focus:ring-primary/30 text-sm resize-none rounded-2xl"
             />
+
+            {/* Background toggle */}
+            <div className="mt-3 flex items-center gap-1 p-1 bauhaus-border rounded-2xl bg-background">
+              <button
+                type="button"
+                onClick={() => setTransparentBg(false)}
+                className={`flex-1 px-3 py-2 text-[11px] font-extrabold uppercase rounded-xl transition-colors ${
+                  !transparentBg ? "bg-ink text-ink-foreground" : "hover:bg-accent"
+                }`}
+                aria-pressed={!transparentBg}
+              >
+                With Background
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransparentBg(true)}
+                className={`flex-1 px-3 py-2 text-[11px] font-extrabold uppercase rounded-xl transition-colors ${
+                  transparentBg ? "bg-ink text-ink-foreground" : "hover:bg-accent"
+                }`}
+                aria-pressed={transparentBg}
+              >
+                No Background
+              </button>
+            </div>
+
             <button
               onClick={generate}
               disabled={loading}
