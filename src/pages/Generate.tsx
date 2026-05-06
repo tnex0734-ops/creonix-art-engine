@@ -12,6 +12,7 @@ import {
 import { ColourCustomiser, DEFAULT_COLORS, type ElementColors } from "@/components/ColourCustomiser";
 import { useColorizedCanvas } from "@/hooks/useColorizedCanvas";
 import { toast } from "sonner";
+import { removeBackground } from "@imgly/background-removal";
 
 type Msg = { role: "user"; content: string; style: string };
 
@@ -56,7 +57,19 @@ const Generate = () => {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      setImageUrl(data.imageUrl);
+      let finalUrl: string = data.imageUrl;
+      if (transparentBg) {
+        try {
+          toast.message("Removing background…");
+          const proxied = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/proxy-image?url=${encodeURIComponent(finalUrl)}`;
+          const blob = await removeBackground(proxied);
+          finalUrl = URL.createObjectURL(blob);
+        } catch (bgErr) {
+          console.error("bg removal failed", bgErr);
+          toast.error("Background removal failed — using original");
+        }
+      }
+      setImageUrl(finalUrl);
       setGenId(data.generation?.id ?? null);
       setPrompt("");
       toast.success("Illustration ready!");
