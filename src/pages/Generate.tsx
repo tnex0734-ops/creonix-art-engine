@@ -12,6 +12,7 @@ import {
 import { ColourCustomiser, DEFAULT_COLORS, type ElementColors } from "@/components/ColourCustomiser";
 import { useColorizedCanvas } from "@/hooks/useColorizedCanvas";
 import { toast } from "sonner";
+import { removeBackground } from "@imgly/background-removal";
 
 type Msg = { role: "user"; content: string; style: string };
 
