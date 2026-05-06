@@ -19,7 +19,8 @@ import type { ElementColors } from "@/components/ColourCustomiser";
 export function useColorizedCanvas(
   imageUrl: string | null,
   colors: ElementColors,
-  zoom: number
+  zoom: number,
+  transparent = false
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
