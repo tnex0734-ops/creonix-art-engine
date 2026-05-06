@@ -132,8 +132,12 @@ export function useColorizedCanvas(
 
     // Always at least draw background even if image not ready yet
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = colors.background;
-    ctx.fillRect(0, 0, cw, ch);
+    if (transparent) {
+      ctx.clearRect(0, 0, cw, ch);
+    } else {
+      ctx.fillStyle = colors.background;
+      ctx.fillRect(0, 0, cw, ch);
+    }
 
     if (!img) return;
 
@@ -145,8 +149,8 @@ export function useColorizedCanvas(
     const dx = (cw - dw) / 2;
     const dy = (ch - dh) / 2;
 
-    paint(ctx, img, cw, ch, dx, dy, dw, dh, colors.background);
-  }, [colors.background, zoom, paint]);
+    paint(ctx, img, cw, ch, dx, dy, dw, dh, colors.background, transparent);
+  }, [colors.background, zoom, paint, transparent]);
 
   // Redraw on: colors change, zoom change, image ready, container resize
   useEffect(() => {
