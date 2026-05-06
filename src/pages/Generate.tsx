@@ -52,7 +52,7 @@ const Generate = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-illustration", {
-        body: { prompt: currentPrompt, style: style.name },
+        body: { prompt: currentPrompt, style: style.name, transparent: transparentBg },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
