@@ -105,6 +105,13 @@ export function useColorizedCanvas(
       ctx.fillRect(dx, dy, dw, dh);
       ctx.globalAlpha = 1;
 
+      // 7. If transparent, mask back to the image's original alpha so the
+      // fillRect-based blend ops don't bleed colour into transparent areas.
+      if (noBg) {
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.drawImage(img, dx, dy, dw, dh);
+      }
+
       // Reset
       ctx.globalCompositeOperation = "source-over";
     },
