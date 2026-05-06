@@ -58,7 +58,10 @@ serve(async (req) => {
     const userId = userData.user.id;
 
     const styleHint = STYLE_PROMPTS[style] ?? style;
-    const fullPrompt = `Create a professional illustration in ${style} style. ${prompt}. Style details: ${styleHint}. The illustration should be clean, vector-like, suitable for designers and graphic artists. High quality, detailed, with clear composition, no text, no watermark, centered.`;
+    const bgInstruction = transparent
+      ? "The illustration MUST have a fully transparent background (no background color, no scenery, no backdrop) — only the subject on transparent. Output as PNG with alpha channel."
+      : "Include a clean, complementary background.";
+    const fullPrompt = `Create a professional illustration in ${style} style. ${prompt}. Style details: ${styleHint}. ${bgInstruction} The illustration should be clean, vector-like, suitable for designers and graphic artists. High quality, detailed, with clear composition, no text, no watermark, centered.`;
 
     // Lovable AI Gateway — Nano Banana 2 (fast, pro-quality image gen)
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
