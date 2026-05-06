@@ -30,9 +30,10 @@ const Generate = () => {
   const [zoom, setZoom] = useState(1);
   const [showPalette, setShowPalette] = useState(false);
   const [colors, setColors] = useState<ElementColors>(DEFAULT_COLORS);
+  const [transparentBg, setTransparentBg] = useState(false);
 
   const historyRef = useRef<HTMLDivElement>(null);
-  const { canvasRef, containerRef, exportCanvas } = useColorizedCanvas(imageUrl, colors, zoom);
+  const { canvasRef, containerRef, exportCanvas } = useColorizedCanvas(imageUrl, colors, zoom, transparentBg);
 
   useEffect(() => {
     historyRef.current?.scrollTo({ top: historyRef.current.scrollHeight, behavior: "smooth" });
