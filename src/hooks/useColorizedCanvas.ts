@@ -179,11 +179,12 @@ export function useColorizedCanvas(
       const ctx = c.getContext("2d");
       if (!ctx) return null;
 
-      // Apply paint pipeline to produce a high-res static image
-      paint(ctx, img, w, h, 0, 0, w, h, bgWhite ? "#ffffff" : colors.background);
+      const useTransparent = transparent && !bgWhite;
+      const bg = bgWhite ? "#ffffff" : colors.background;
+      paint(ctx, img, w, h, 0, 0, w, h, bg, useTransparent);
       return c;
     },
-    [colors.background, paint]
+    [colors.background, paint, transparent]
   );
 
   return { canvasRef, containerRef, exportCanvas };
