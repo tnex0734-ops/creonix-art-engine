@@ -65,13 +65,18 @@ export function useColorizedCanvas(
       dy: number,
       dw: number,
       dh: number,
-      bg: string
+      bg: string,
+      noBg: boolean
     ) => {
-      // 1. Background fill
+      // 1. Background fill (skip if transparent)
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, cw, ch);
+      if (!noBg) {
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, cw, ch);
+      } else {
+        ctx.clearRect(0, 0, cw, ch);
+      }
 
       // 2. Draw the image
       ctx.drawImage(img, dx, dy, dw, dh);
