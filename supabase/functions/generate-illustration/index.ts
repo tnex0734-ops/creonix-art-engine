@@ -26,7 +26,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, style } = await req.json();
+    const { prompt, style, transparent } = await req.json();
     if (!prompt || typeof prompt !== "string" || prompt.length < 3) {
       return new Response(JSON.stringify({ error: "Prompt is required (min 3 chars)" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
