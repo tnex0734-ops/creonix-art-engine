@@ -49,8 +49,8 @@ const Landing = () => {
 
       {/* HERO — asymmetric Bauhaus grid */}
       <section
-        className="relative overflow-hidden border-b-[3px] border-ink bg-background flex items-center"
-        style={{ height: "calc(100vh - 64px)", minHeight: "560px" }}
+        className="relative overflow-hidden border-b-[3px] border-ink bg-background flex items-center py-10 lg:py-0"
+        style={{ minHeight: "560px" }}
       >
         {/* Background grid overlay */}
         <div
