@@ -103,7 +103,7 @@ const Landing = () => {
               ref={tiltRef}
               onMouseMove={handleTiltMove}
               onMouseLeave={handleTiltLeave}
-              className="lg:col-span-4 relative min-h-[220px] lg:min-h-[340px] [perspective:1200px]"
+              className="hidden lg:block lg:col-span-4 relative min-h-[220px] lg:min-h-[340px] [perspective:1200px]"
               style={{ ["--mx" as never]: 0, ["--my" as never]: 0 } as React.CSSProperties}
             >
               {/* Card 1 — back */}
