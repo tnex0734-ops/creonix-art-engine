@@ -49,8 +49,8 @@ const Landing = () => {
 
       {/* HERO — asymmetric Bauhaus grid */}
       <section
-        className="relative overflow-hidden border-b-[3px] border-ink bg-background flex items-center"
-        style={{ height: "calc(100vh - 64px)", minHeight: "560px" }}
+        className="relative overflow-hidden border-b-[3px] border-ink bg-background flex items-center py-10 lg:py-0"
+        style={{ minHeight: "560px" }}
       >
         {/* Background grid overlay */}
         <div
@@ -103,7 +103,7 @@ const Landing = () => {
               ref={tiltRef}
               onMouseMove={handleTiltMove}
               onMouseLeave={handleTiltLeave}
-              className="lg:col-span-4 relative min-h-[220px] lg:min-h-[340px] [perspective:1200px]"
+              className="hidden lg:block lg:col-span-4 relative min-h-[220px] lg:min-h-[340px] [perspective:1200px]"
               style={{ ["--mx" as never]: 0, ["--my" as never]: 0 } as React.CSSProperties}
             >
               {/* Card 1 — back */}
